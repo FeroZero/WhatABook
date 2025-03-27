@@ -8,8 +8,10 @@ namespace WhatABook.Models
 		[Key]
 		public int OrdenId { get; set; }
 
-		[ForeignKey("Usuario")]
+		[ForeignKey("ApplicationUser")]
 		public int UsuarioId { get; set; }
+
+		public DateOnly Fecha { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
 		public ICollection<OrdenesDetalle> ordenes { get; set; } = new List<OrdenesDetalle>();
 	}

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WhatABook.Models;
 
@@ -25,8 +26,8 @@ public class Libros
     [Required(ErrorMessage = "Campo obligatorio")]
     public string ImagenUrl { get; set; }
 
-    public virtual ICollection<Generos> Generos { get; set; } = new List<Generos>();
+    public ICollection<GenerosDetalle> GenerosDetalles { get; set; } = new List<GenerosDetalle>();
 
-
+    public Compras Compras { get; set; } = new Compras();
 }
 

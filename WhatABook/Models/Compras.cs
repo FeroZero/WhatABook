@@ -26,6 +26,7 @@ namespace WhatABook.Models
 		public double PrecioCompra { get; set; }
 
 		[ForeignKey("Libros")]
-		public int Libros { get; set; }
+		public int LibroId { get; set; }
+		public Libros Libros { get; set; } = new Libros();
 	}
 }
