@@ -168,10 +168,9 @@ namespace WhatABook.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Direccion")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Edad")
+                    b.Property<int?>("Edad")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -188,7 +187,6 @@ namespace WhatABook.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")

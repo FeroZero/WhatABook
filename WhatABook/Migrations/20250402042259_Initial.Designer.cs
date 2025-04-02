@@ -12,7 +12,7 @@ using WhatABook.Data;
 namespace WhatABook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250330073103_Initial")]
+    [Migration("20250402042259_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -171,10 +171,9 @@ namespace WhatABook.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Direccion")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Edad")
+                    b.Property<int?>("Edad")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -191,7 +190,6 @@ namespace WhatABook.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
