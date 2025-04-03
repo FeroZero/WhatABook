@@ -29,6 +29,6 @@ public class Libros
 	public int GeneroId { get; set; }
 	public Generos Generos { get; set; }
 
-	public Compras Compras { get; set; } // Relación 1 a 1 con Compras
+	public Compras Compras { get; set; }
 }
 
