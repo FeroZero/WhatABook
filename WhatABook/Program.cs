@@ -5,6 +5,7 @@ using WhatABook.Client.Pages;
 using WhatABook.Components;
 using WhatABook.Components.Account;
 using WhatABook.Data;
+using WhatABook.Services;
 
 namespace WhatABook
 {
@@ -44,7 +45,10 @@ namespace WhatABook
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-            var app = builder.Build();
+            builder.Services.AddScoped<LibrosService>();
+			builder.Services.AddScoped<GenerosService>();
+
+			var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

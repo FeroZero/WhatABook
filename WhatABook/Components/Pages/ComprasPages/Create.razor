@@ -1,0 +1,72 @@
+﻿@page "/Compras/Create"
+@inject ComprasService comprasService
+@inject NavigationManager navigate
+@rendermode InteractiveServer
+
+<PageTitle>Crear Compra</PageTitle>
+
+<EditForm model="compra" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <div class="card-title">Crear Nueva Compra</div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3 ms-5">
+                        <label class="form-label"><strong>Título</strong></label>
+                        <InputText class="form-control" @bind-value="compra.LibroNombre"></InputText>
+                        <ValidationMessage For="() => compra.LibroNombre" />
+                    </div>
+
+                    <div class="col-3">
+                        <label class="form-label"><strong>% Ganancia</strong></label>
+                        <InputNumber class="form-control" @bind-value="compra.PorcentajeGanancia"></InputNumber>
+                        <ValidationMessage For="() => compra.PorcentajeGanancia" />
+                    </div>
+
+                    <div class="col-3">
+                        <label class="form-label"><strong>Costo</strong></label>
+                        <InputNumber class="form-control" @bind-value="compra.Costo"></InputNumber>
+                        <ValidationMessage For="() => compra.Costo" />
+                    </div> 
+                    
+                    <div class="col-3">
+                        <label class="form-label"><strong>Cantidad</strong></label>
+                        <InputNumber class="form-control" @bind-value="compra.Cantidad"></InputNumber>
+                        <ValidationMessage For="() => compra.Cantidad" />
+                    </div>
+
+                    <div class="col-3">
+                        <label class="form-label"><strong>Precio de Venta</strong></label>
+                        <InputNumber class="form-control" @bind-value="compra.PrecioVenta readonly"></InputNumber>
+                        <ValidationMessage For="() => compra.PrecioVenta" />
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="card-footer text-center">
+                <a href="/Libros/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
+                <button type="submit" class="bi bi-floppy btn btn-outline-success">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Compras compra { get; set; } = new Compras();
+
+    public void CalcularPrecioVenta()
+    {
+        compra.PrecioVenta = compra.Costo * (1 + compra.PorcentajeGanancia / 100);
+    }
+    public async Task Guardar()
+    {
+        var resultado = await comprasService.Guardar(compra);
+        navigate.NavigateTo("/Libros/Index");
+    }
+}

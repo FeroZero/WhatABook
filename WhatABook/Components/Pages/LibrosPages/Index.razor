@@ -1,0 +1,56 @@
+﻿@page "/Libros/Index"
+@inject LibrosService librosService
+@inject NavigationManager navigate
+
+
+<PageTitle>Lista de Libros</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <div class="card-title">Lista de Libros</div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor(es)</th>
+                        <th>Género</th>
+                        <th>Fecha de Publicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var libro in Listalibros)
+                    {
+                        <tr>
+                            <td>@libro.Titulo</td>
+                            <td>@libro.Autores</td>
+                            <td>@libro.Generos.TipoGeneros</td>
+                            <td>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a href="#" class="bi bi-pencil-square btn btn-outline-warning">Editar</a>
+                                <a href="#" class="bi bi-trash btn btn-outline-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer text-center">
+            <a href="/Libros/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Libros> Listalibros { get; set; } = new List<Libros>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Listalibros = await librosService.Listar(o => o.LibroId > 0);
+    }
+}
