@@ -47,6 +47,7 @@ namespace WhatABook
 
             builder.Services.AddScoped<LibrosService>();
 			builder.Services.AddScoped<GenerosService>();
+			builder.Services.AddScoped<ComprasService>();
 
 			var app = builder.Build();
 
