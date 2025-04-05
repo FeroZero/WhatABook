@@ -12,14 +12,13 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Compras
-			.Include(g => g.Libros)
 			.Where(criterio)
 			.ToListAsync();
 	}
 
 	public async Task<bool> Guardar(Compras compra)
 	{
-		if (!await Existe(compra.LibroId))
+		if (!await Existe(compra.CompraId))
 			return await Insertar(compra);
 		else
 			return await Modificar(compra);
@@ -29,7 +28,7 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Compras
-			.AnyAsync(p => p.LibroId == id);
+			.AnyAsync(p => p.CompraId == id);
 	}
 	private async Task<bool> Modificar(Compras compra)
 	{
