@@ -48,6 +48,7 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexo = await DbFactory.CreateDbContextAsync();
 		return await contexo.Libros
+			.Include(g => g.Generos)
 			.FirstOrDefaultAsync(p => p.LibroId == id);
 	}
 	public async Task<List<Libros>> Listar(Expression<Func<Libros, bool>> criterio)
