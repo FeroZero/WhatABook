@@ -8,31 +8,10 @@ public class Compras
 	[Key]
 	public int CompraId { get; set; }
 
-	[StringLength(70, ErrorMessage = "Límite Excedido.")]
 	[Required(ErrorMessage = "Campo Obligatorio.")]
-	public string LibroNombre { get; set; }
+	public DateTime Fecha { get; set; } = DateTime.Now;
 
-	[Required(ErrorMessage = "Campo Obligatorio.")]
-	[Range(1, 100, ErrorMessage = "Porcentaje Excedido.")]
-	public double PorcentajeGanancia { get; set; }
-
-	[Required(ErrorMessage = "Campo Obligatorio.")]
-	[Range(0.01, 1000000, ErrorMessage = "Costo Excedido.")]
-	public double Costo { get; set; }
-
-	[Required(ErrorMessage = "Campo Obligatorio.")]
-	[Range(1, 200, ErrorMessage = "Cantidad Excedida.")]
-	public int Cantidad { get; set; }
-
-	[Required]
-	public double PrecioVenta { get; set; }
-
-	[Required]
-	public double PrecioCompra { get; set; }
-
-	[ForeignKey("Libro")]
-	public int LibroId { get; set; }
-
-	public Libros Libro { get; set; }
+	[ForeignKey("CompraId")]
+	public ICollection<ComprasDetalle> CompraDetalle { get; set; } = new List<ComprasDetalle>();
 }
 
