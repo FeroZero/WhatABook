@@ -6,7 +6,7 @@ namespace WhatABook.Models;
 public class Compras
 {
 	[Key]
-	public int LibroId { get; set; }
+	public int CompraId { get; set; }
 
 	[StringLength(70, ErrorMessage = "Límite Excedido.")]
 	[Required(ErrorMessage = "Campo Obligatorio.")]
@@ -30,6 +30,9 @@ public class Compras
 	[Required]
 	public double PrecioCompra { get; set; }
 
-	public Libros Libros { get; set; } // Relación 1 a 1 con Libros
+	[ForeignKey("Libro")]
+	public int LibroId { get; set; }
+
+	public Libros Libro { get; set; }
 }
 
