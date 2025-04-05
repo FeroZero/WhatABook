@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.Linq.Expressions;
 using WhatABook.Data;
 using WhatABook.Models;
@@ -48,15 +49,14 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexo = await DbFactory.CreateDbContextAsync();
 		return await contexo.Libros
-			.Include(g => g.Generos)
-			.FirstOrDefaultAsync(p => p.LibroId == id);
+			.Include(g => g.ListaGeneros)
+			.FirstOrDefaultAsync(l => l.LibroId == id);
 	}
-	public async Task<List<Libros>> Listar(Expression<Func<Libros, bool>> criterio)
+	public async Task<List<Libros>> Listar()
 	{
-		await using var contexto = await DbFactory.CreateDbContextAsync();
-		return await contexto.Libros
-			.Include(g => g.Generos)
-			.Where(criterio)
+		await using var context = await DbFactory.CreateDbContextAsync();
+		return await context.Libros
+			.Include(l => l.ListaGeneros)
 			.ToListAsync();
 	}
 	public async Task<bool> ExisteLibro(string titulo, int id)
@@ -65,6 +65,4 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		return await contexto.Libros
 			.AnyAsync(t => t.Titulo.ToLower().Equals(titulo.ToLower()) && t.LibroId != id);
 	}
-
-	//Posible funcion para agregar imagen.
 }
