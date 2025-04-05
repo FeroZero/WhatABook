@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WhatABook.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Second : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -216,23 +216,31 @@ namespace WhatABook.Migrations
                 name: "Compras",
                 columns: table => new
                 {
-                    LibroId = table.Column<int>(type: "int", nullable: false),
+                    CompraId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     LibroNombre = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: false),
                     PorcentajeGanancia = table.Column<double>(type: "float", nullable: false),
                     Costo = table.Column<double>(type: "float", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     PrecioVenta = table.Column<double>(type: "float", nullable: false),
-                    PrecioCompra = table.Column<double>(type: "float", nullable: false)
+                    PrecioCompra = table.Column<double>(type: "float", nullable: false),
+                    LibroId = table.Column<int>(type: "int", nullable: false),
+                    LibrosLibroId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Compras", x => x.LibroId);
+                    table.PrimaryKey("PK_Compras", x => x.CompraId);
                     table.ForeignKey(
                         name: "FK_Compras_Libros_LibroId",
                         column: x => x.LibroId,
                         principalTable: "Libros",
                         principalColumn: "LibroId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Compras_Libros_LibrosLibroId",
+                        column: x => x.LibrosLibroId,
+                        principalTable: "Libros",
+                        principalColumn: "LibroId");
                 });
 
             migrationBuilder.CreateTable(
@@ -277,16 +285,6 @@ namespace WhatABook.Migrations
                     { 5, "Romantica" }
                 });
 
-            migrationBuilder.InsertData(
-                table: "Libros",
-                columns: new[] { "LibroId", "Autores", "Descripcion", "FechaPublicacion", "GeneroId", "ImagenUrl", "Titulo" },
-                values: new object[] { 1, "mango", "hola", new DateTime(2004, 3, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Cosa", "Muerto" });
-
-            migrationBuilder.InsertData(
-                table: "Compras",
-                columns: new[] { "LibroId", "Cantidad", "Costo", "LibroNombre", "PorcentajeGanancia", "PrecioCompra", "PrecioVenta" },
-                values: new object[] { 1, 40, 400.0, "Julio Ceasar", 33.0, 0.0, 0.0 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -325,6 +323,16 @@ namespace WhatABook.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Compras_LibroId",
+                table: "Compras",
+                column: "LibroId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Compras_LibrosLibroId",
+                table: "Compras",
+                column: "LibrosLibroId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Libros_GeneroId",
