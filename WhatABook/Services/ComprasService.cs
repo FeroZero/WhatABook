@@ -12,8 +12,17 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Compras
+			.Include(l => l.Libro)
 			.Where(criterio)
 			.ToListAsync();
+	}
+
+	public async Task<Compras?> Buscar(int id)
+	{
+		await using var contexo = await DbFactory.CreateDbContextAsync();
+		return await contexo.Compras
+			.Include(l => l.Libro)
+			.FirstOrDefaultAsync(p => p.CompraId == id);
 	}
 
 	public async Task<bool> Guardar(Compras compra)
