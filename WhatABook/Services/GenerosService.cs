@@ -11,6 +11,7 @@ public class GenerosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Generos
+			.Include(g => g.Detalles)
 			.Where(criterio)
 			.ToListAsync();
 	}
