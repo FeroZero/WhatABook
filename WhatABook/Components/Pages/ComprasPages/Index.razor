@@ -1,0 +1,59 @@
+﻿@page "/Compras/Index"
+@inject ComprasService comprasService
+@inject NavigationManager navigate
+
+
+<PageTitle>Lista de Libros</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <div class="card-title">Lista de Libros</div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor(es)</th>
+                        <th>Género</th>
+                        <th>Fecha de Publicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var libro in ListaCompras)
+                    {
+                        <tr>
+                            <td>@libro.LibroNombre</td>
+                            <td>@libro.PorcentajeGanancia</td>
+                            <td>@libro.Costo</td>
+                            <td>@libro.Cantidad</td>
+                            <td>@libro.PrecioVenta</td>
+                            <td>@libro.PrecioCompra</td>
+
+                            <td>
+                                <a href="#" class="bi bi-pencil-square btn btn-outline-warning">Editar</a>
+                                <a href="#" class="bi bi-trash btn btn-outline-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer text-center">
+            <a href="/Libros/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Compras> ListaCompras { get; set; } = new List<Compras>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCompras = await comprasService.Listar(o => o.LibroId > 0);
+    }
+}

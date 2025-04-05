@@ -9,7 +9,4 @@ public class Generos
 
     [Required(ErrorMessage = "Campo obligatorio")]
     public string TipoGeneros { get; set; }
-
-    public ICollection<GenerosDetalle> GenerosDetalle { get; set; } = new List<GenerosDetalle>();
-
 }

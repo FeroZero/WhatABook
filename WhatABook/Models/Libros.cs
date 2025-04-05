@@ -5,29 +5,30 @@ namespace WhatABook.Models;
 
 public class Libros
 {
-    [Key]
+	[Key]
+	public int LibroId { get; set; }
 
-    public int LibroId { get; set; }
+	[RegularExpression(@"[A-Za-z\s]+$", ErrorMessage = "No se permiten caracteres especiales o números.")]
+	[Required(ErrorMessage = "Campo obligatorio.")]
+	public string Titulo { get; set; }
 
-    [RegularExpression(@"[A-Za-z\s]+$", ErrorMessage = "No se permiten caracteres especiales o numeros")]
-    [Required(ErrorMessage = " Campo obligatorio")]
-    public string Titulo { get; set; }
+	[Required(ErrorMessage = "Campo obligatorio.")]
+	[RegularExpression(@"[A-Za-z\s]+$", ErrorMessage = "No se permiten caracteres especiales o números.")]
+	public string Autores { get; set; }
 
-    [Required(ErrorMessage = "Campo obligatorio")]
-    [RegularExpression(@"[A-Za-z\s]+$", ErrorMessage = "No se permiten caracteres especiales o numeros")]
-    public string Autores { get; set; }
+	[Required(ErrorMessage = "Campo obligatorio.")]
+	public string Descripcion { get; set; }
 
-    [Required(ErrorMessage = " Campo obligatorio")]
-    public string Descripcion { get; set; }
+	[Required(ErrorMessage = "Campo obligatorio.")]
+	public DateTime FechaPublicacion { get; set; }
 
-    [Required(ErrorMessage = "Campo obligatorio")]
-    public DateTime FechaPublicacion { get; set; }
+	[Required(ErrorMessage = "Campo obligatorio.")]
+	public string ImagenUrl { get; set; }
 
-    [Required(ErrorMessage = "Campo obligatorio")]
-    public string ImagenUrl { get; set; }
+	[ForeignKey("Generos")]
+	public int GeneroId { get; set; }
+	public Generos Generos { get; set; }
 
-    public ICollection<GenerosDetalle> GenerosDetalles { get; set; } = new List<GenerosDetalle>();
-
-    public Compras Compras { get; set; } = new Compras();
+	public ICollection<Compras> Compras { get; set; } = new List<Compras>();
 }
 
