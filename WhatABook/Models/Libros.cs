@@ -29,6 +29,6 @@ public class Libros
 	public int GeneroId { get; set; }
 	public Generos Generos { get; set; }
 
-	public Compras Compras { get; set; }
+	public ICollection<Compras> Compras { get; set; } = new List<Compras>();
 }
 
