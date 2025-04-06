@@ -2,46 +2,65 @@
 @inject LibrosService librosService
 @inject NavigationManager navigate
 
-
 <PageTitle>Lista de Libros</PageTitle>
 
-<div class="container">
-    <div class="card shadow-lg">
-        <div class="card-header">
-            <div class="card-title">Lista de Libros</div>
+<div class="container my-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Lista de Libros <i class="bi bi-book"></i></h4>
+            <a href="/Libros/Create" class="btn btn-light">
+                <i class="bi bi-plus-circle"></i> Crear Nuevo Libro
+            </a>
         </div>
 
         <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Autor(es)</th>
-                        <th>Género</th>
-                        <th>Fecha de Publicación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var libro in Listalibros)
-                    {
-                        <tr>
-                            <td>@libro.Titulo</td>
-                            <td>@libro.Autores</td>
-                            <td>@libro.Generos.TipoGeneros</td>
-                            <td>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <a href="#" class="bi bi-pencil-square btn btn-outline-warning">Editar</a>
-                                <a href="#" class="bi bi-trash btn btn-outline-danger">Eliminar</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            @if (Listalibros.Count == 0)
+            {
+                <div class="alert alert-info text-center">
+                    No hay libros registrados todavía.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Título</th>
+                                <th>Autor(es)</th>
+                                <th>Género</th>
+                                <th>Fecha de Publicación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var libro in Listalibros)
+                            {
+                                <tr>
+                                    <td>@libro.Titulo</td>
+                                    <td>@libro.Autores</td>
+                                    <td>@libro.Generos?.TipoGeneros</td>
+                                    <td>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="/Libros/Edit/@libro.LibroId" class="btn btn-outline-warning" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a href="/Libros/Delete/@libro.LibroId" class="btn btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
 
-        <div class="card-footer text-center">
-            <a href="/Libros/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
+        <div class="card-footer text-muted text-center small py-2">
+            Panel de control • WhatABook © 2025
         </div>
     </div>
 </div>
@@ -52,5 +71,21 @@
     protected override async Task OnInitializedAsync()
     {
         Listalibros = await librosService.Listar(o => o.LibroId > 0);
+    }
+
+    private void NavigateToEdit(int libroId)
+    {
+        navigate.NavigateTo($"/Libros/Edit/{libroId}");
+    }
+
+    private async Task DeleteLibro(int libroId)
+    {
+        
+        bool confirmDelete = await Task.FromResult(true); 
+        if (confirmDelete)
+        {
+            
+            Listalibros = await librosService.Listar(o => o.LibroId > 0);
+        }
     }
 }
