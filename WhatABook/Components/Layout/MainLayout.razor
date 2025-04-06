@@ -1,23 +1,55 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+
+<div class="navbar navbar-expand-lg fixed-top custom-navbar" id="NavigationBar">
+    <div class="container-fluid">
+        <!-- Logo con ícono y texto -->
+        <a class="navbar-brand d-flex align-items-center" href="" style="font-family: 'Permanent Marker', sans-serif; color: #FFFFFF; font-weight: bold;">
+            <span>WhatABook</span>
+            <i class="bi bi-book ms-2"></i>
+        </a>
+        <!-- Botón de colapso para dispositivos móviles -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+    </div>
+</div>
+
+
+<main class="flex-grow-1 p-4 mt-5 pt-7 bg-white">
+    <!-- Cambié pt-3 a pt-5 para aumentar el padding superior -->
+
+
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    <article class="content bg-white">
+        @Body
+    </article>
+</main>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+
+<style>
+    .custom-navbar {
+        background-color: #660f0f;/* Color de fondo personalizado */
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .nav-link {
+        transition: color 0.3s ease;
+    }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+    .mt-5 {
+        margin-top: 5rem;
+    }
+</style>

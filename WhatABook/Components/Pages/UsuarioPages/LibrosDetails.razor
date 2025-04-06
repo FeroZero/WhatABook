@@ -1,0 +1,120 @@
+﻿@page "/BookDetails/{id:int}"
+@inject LibrosService LibrosService
+@inject ComprasService ComprasService
+
+@using WhatABook.Models
+
+<h3>Detalle del Libro</h3>
+
+@if (libro == null)
+{
+    <p>Cargando o libro no encontrado...</p>
+}
+else
+{
+    <div class="book-detail-container">
+        <img src="@libro.ImagenUrl" alt="@libro.Titulo" class="book-detail-img" />
+
+        <div class="book-detail-info">
+            <h2>@libro.Titulo</h2>
+            <p><strong>Autor:</strong> @libro.Autores</p>
+            <p><strong>Descripción:</strong> @libro.Descripcion</p>
+            <p><strong>Fecha de publicación:</strong> @libro.FechaPublicacion.ToShortDateString()</p>
+
+            @if (precioLibro.HasValue)
+            {
+                <p><strong>Precio:</strong> $@precioLibro.Value</p>
+            }
+            else
+            {
+                <p class="text-muted"><strong>Precio:</strong> No disponible</p>
+            }
+
+            <button class="btn btn-primary">
+                <i class="bi bi-cart"></i> Añadir al carrito
+            </button>
+            <a href="/Usuario/Index" class="btn btn-secondary ms-2">Volver al inicio</a>
+        </div>
+    </div>
+}
+
+<style>
+    .book-detail-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .book-detail-img {
+        width: 300px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-detail-info {
+        max-width: 600px;
+        font-family: Arial, sans-serif;
+    }
+
+        .book-detail-info h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .book-detail-info p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .book-detail-info strong {
+            color: #000;
+        }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Libros? libro;
+    private double? precioLibro;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var libros = await LibrosService.Listar(l => true);
+        libro = libros.FirstOrDefault(l => l.LibroId == id);
+
+        if (libro != null)
+        {
+            var compras = await ComprasService.Listar(c => c.LibroId == libro.LibroId);
+            var compra = compras.OrderByDescending(c => c.CompraId).FirstOrDefault();
+            precioLibro = compra?.PrecioVenta;
+        }
+    }
+}

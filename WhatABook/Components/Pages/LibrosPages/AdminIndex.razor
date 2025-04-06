@@ -1,0 +1,68 @@
+﻿@page "/admin/Index"
+@inject NavigationManager navigate
+@rendermode InteractiveServer
+
+<PageTitle>Panel de Administración</PageTitle>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold"><i class="bi bi-person-lines-fill"></i> Administración</h1>
+        <p class="text-muted">Bienvenida al panel de administración. Gestiona libros, ventas y más.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sección de Libros -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-light h-100">
+                <h5 class="card-title"><i class="bi bi-book"></i> Libros</h5>
+                <p class="card-text text-muted">Administra los libros disponibles en el sistema.</p>
+                <button type="button" class="btn btn-primary mt-auto" @onclick="IrALibros">
+                    Ver Libros
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de Compras -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-light h-100">
+                <h5 class="card-title"><i class="bi bi-cart"></i> Compras</h5>
+                <p class="card-text text-muted">Revisa las compras realizadas por los clientes.</p>
+                <button type="button" class="btn btn-primary mt-auto" @onclick="IrACompras">
+                    Ver Compras
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de Usuarios -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-light h-100">
+                <h5 class="card-title"><i class="bi bi-people-fill"></i> Usuarios</h5>
+                <p class="card-text text-muted">Gestiona los usuarios registrados y administradores.</p>
+                <button type="button" class="btn btn-primary mt-auto" @onclick="IrAUsuarios">
+                    Administrar Usuarios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5 text-muted small">
+        Panel de control • WhatABook © 2025
+    </div>
+</div>
+
+@code {
+    public void IrALibros()
+    {
+        navigate.NavigateTo("/Libros/Index");
+    }
+
+    public void IrACompras()
+    {
+        navigate.NavigateTo("/Compras/Index");
+    }
+
+    public void IrAUsuarios()
+    {
+        navigate.NavigateTo("/Usuarios");
+    }
+}

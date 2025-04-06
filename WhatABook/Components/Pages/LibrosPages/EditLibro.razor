@@ -1,46 +1,52 @@
-﻿@page "/Libros/Create"
+﻿@page "/Libros/Edit/{LibroId:int}"
 @inject LibrosService librosService
 @inject GenerosService generosService
 @inject NavigationManager navigate
 @rendermode InteractiveServer
 
-<PageTitle>Crear Libro</PageTitle>
+<PageTitle>Editar Libro</PageTitle>
 
 <EditForm Model="libro" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-    <div class="container">
+    <div class="container mt-5">
         <div class="card shadow-lg">
-            <div class="card-header">
-                <div class="card-title">Crear Nuevo Libro</div>
+            <div class="card-header bg-dark text-white text-center">
+                <h3><strong>Editar Libro</strong></h3>
             </div>
 
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3 ms-5">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Título</strong></label>
-                        <InputText class="form-control" @bind-value="libro.Titulo"></InputText>
+                        <InputText class="form-control" @bind-value="libro.Titulo" placeholder="Ingrese el título"></InputText>
                         <ValidationMessage For="() => libro.Titulo" />
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Autor(es)</strong></label>
-                        <InputText class="form-control" @bind-value="libro.Autores"></InputText>
+                        <InputText class="form-control" @bind-value="libro.Autores" placeholder="Ingrese el autor(es)"></InputText>
                         <ValidationMessage For="() => libro.Autores" />
                     </div>
 
-                    <div class="col-3 ms-5">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Descripción</strong></label>
-                        <InputTextArea class="form-control" @bind-value="libro.Descripcion"></InputTextArea>
+                        <InputTextArea class="form-control" @bind-value="libro.Descripcion" rows="3" placeholder="Ingrese la descripción"></InputTextArea>
                         <ValidationMessage For="() => libro.Descripcion" />
                     </div>
 
-                    <div class="col-3 ms-5">
+                    @* <div class="col-md-6">
+                        <label class="form-label"><strong>Precio de Venta</strong></label>
+                        <InputNumber class="form-control" @bind-Value="compras.PrecioVenta" placeholder="Ingrese precio" step="0.01" />
+                        <ValidationMessage For="() => compras.PrecioVenta" />
+                    </div
+ *@
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Fecha de Publicación</strong></label>
                         <InputDate class="form-control" @bind-value="libro.FechaPublicacion"></InputDate>
                         <ValidationMessage For="() => libro.FechaPublicacion" />
                     </div>
 
-                    <div class="col-3 ms-5">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Género</strong></label>
                         <InputSelect class="form-select" @bind-value="libro.GeneroId">
                             <option value="0">Seleccione un Género</option>
@@ -52,34 +58,46 @@
                         <ValidationMessage For="() => libro.GeneroId" />
                     </div>
 
-                    <div class="col-3 ms-5">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label"><strong>Imagen</strong></label>
-                        <InputText class="form-control" @bind-value="libro.ImagenUrl"></InputText>
-                        <ValidationMessage For="() => libro.ImagenUrl"/>
+                        <InputText class="form-control" @bind-value="libro.ImagenUrl" placeholder="Ingrese la URL de la imagen"></InputText>
+                        <ValidationMessage For="() => libro.ImagenUrl" />
                     </div>
                 </div>
             </div>
 
             <div class="card-footer text-center">
-                <a href="/Libros/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
-                <button type="submit" class="bi bi-floppy btn btn-outline-success">Guardar</button>
+                <button type="button" class="btn btn-outline-primary" @onclick="Volver">
+                    <i class="bi bi-arrow-return-left"></i> Volver
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-pencil"></i> Actualizar
+                </button>
             </div>
         </div>
     </div>
 </EditForm>
 
 @code {
+    [Parameter]
+    public int LibroId { get; set; }
     public Libros libro { get; set; } = new Libros();
     public List<Generos> ListaGeneros { get; set; } = new List<Generos>();
 
     protected override async Task OnInitializedAsync()
     {
+        libro = await librosService.Buscar(LibroId) ?? new Libros();
         ListaGeneros = await generosService.Listar(o => o.GeneroId > 0);
     }
 
     public async Task Guardar()
     {
         var resultado = await librosService.Guardar(libro);
-            navigate.NavigateTo("/Libros/Index");
+        navigate.NavigateTo("/Libros/Index");
+    }
+
+    public void Volver()
+    {
+        navigate.NavigateTo("/Libros/Index");
     }
 }

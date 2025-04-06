@@ -1,0 +1,103 @@
+﻿@page "/Libros/Create"
+@inject LibrosService librosService
+@inject GenerosService generosService
+@inject ComprasService comprasService
+@inject NavigationManager navigate
+@rendermode InteractiveServer
+
+<PageTitle>Crear Libro</PageTitle>
+
+<EditForm Model="libro" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container mt-5">
+        <div class="card shadow-lg rounded-4">
+            <div class="card-header bg-dark text-white text-center rounded-top-4">
+                <h3><strong>Crear Nuevo Libro</strong></h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Título</strong></label>
+                        <InputText class="form-control" @bind-value="libro.Titulo" placeholder="Ingrese el título" />
+                        <ValidationMessage For="() => libro.Titulo" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Autor(es)</strong></label>
+                        <InputText class="form-control" @bind-value="libro.Autores" placeholder="Ingrese el autor o autores" />
+                        <ValidationMessage For="() => libro.Autores" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Descripción</strong></label>
+                        <InputTextArea class="form-control" @bind-value="libro.Descripcion" placeholder="Ingrese una breve descripción" rows="3" />
+                        <ValidationMessage For="() => libro.Descripcion" />
+                    </div>
+
+                    @* <div class="col-md-6">
+                        <label class="form-label"><strong>Precio de Venta</strong></label>
+                        <InputNumber class="form-control" @bind-Value="compras.PrecioVenta" placeholder="Ingrese precio" step="0.01" />
+                        <ValidationMessage For="() => compras.PrecioVenta" />
+                     </div *@
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Fecha de Publicación</strong></label>
+                        <InputDate class="form-control" @bind-value="libro.FechaPublicacion" />
+                        <ValidationMessage For="() => libro.FechaPublicacion" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Género</strong></label>
+                        <InputSelect class="form-select" @bind-value="libro.GeneroId">
+                            <option value="0">Seleccione un Género</option>
+                            @foreach (var genero in ListaGeneros)
+                            {
+                                <option value="@genero.GeneroId">@genero.TipoGeneros</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => libro.GeneroId" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Imagen (URL)</strong></label>
+                        <InputText class="form-control" @bind-value="libro.ImagenUrl" placeholder="https://..." />
+                        <ValidationMessage For="() => libro.ImagenUrl" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-secondary me-2" @onclick="Volver">
+                    <i class="bi bi-arrow-return-left"></i> Volver
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-floppy"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Libros libro { get; set; } = new Libros();
+    public List<Generos> ListaGeneros { get; set; } = new List<Generos>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaGeneros = await generosService.Listar(o => o.GeneroId > 0);
+    }
+
+    public async Task Guardar()
+    {
+        var resultado = await librosService.Guardar(libro);
+        navigate.NavigateTo("/Libros/Index");
+    }
+
+    public void Volver()
+    {
+        navigate.NavigateTo("/Libros/Index");
+    }
+}

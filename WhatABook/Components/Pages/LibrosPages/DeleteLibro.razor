@@ -1,0 +1,69 @@
+﻿@page "/Libros/Delete/{LibroId:int}"
+@inject LibrosService librosService
+@inject NavigationManager navigationManager
+@using WhatABook.Models
+
+@rendermode InteractiveServer
+<PageTitle>Eliminar Libro</PageTitle>
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-danger">
+        <div class="card-header  bg-dark text-white text-center">
+            <h3><strong>Eliminar Libro</strong></h3>
+        </div>
+
+        <div class="card-body">
+            <div class="text-center">
+                <h4><strong>¿Está seguro de que desea eliminar este libro?</strong></h4>
+            </div>
+            <ul class="list-group mt-4">
+                <li class="list-group-item"><strong>ID: </strong>@libro.LibroId</li>
+                <li class="list-group-item"><strong>Título: </strong>@libro.Titulo</li>
+                <li class="list-group-item"><strong>Autor(es): </strong>@libro.Autores</li>
+                <li class="list-group-item"><strong>Género: </strong>@libro.Generos?.TipoGeneros</li>
+                <li class="list-group-item"><strong>Fecha de Publicación: </strong>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</li>
+            </ul>
+        </div>
+
+        <div class="card-footer text-center">
+            <button type="button" class="btn btn-outline-secondary" @onclick="Volver">
+                <i class="bi bi-arrow-return-left"></i> Volver
+            </button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+@Mensaje
+
+@code {
+    [Parameter]
+    public int LibroId { get; set; }
+    public Libros libro { get; set; } = new Libros();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        libro = await librosService.Buscar(LibroId);
+    }
+
+    private async Task Eliminar()
+    {
+        var eliminado = await librosService.Eliminar(LibroId);
+        if (eliminado)
+        {
+            Mensaje = "El libro ha sido eliminado correctamente.";
+            navigationManager.NavigateTo("/Libros/Index");
+        }
+        else
+        {
+            Mensaje = "No se ha podido eliminar el libro.";
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/Libros/Index");
+    }
+}
