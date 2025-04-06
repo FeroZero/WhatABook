@@ -7,13 +7,11 @@ namespace WhatABook.Services;
 
 public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 {
-
-	public async Task<List<Compras>> Listar(Expression<Func<Compras, bool>> criterio)
+	public async Task<List<Compras>> Listar()
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Compras
-			.Include(l => l.Libro)
-			.Where(criterio)
+			.Include(d => d.CompraDetalle)
 			.ToListAsync();
 	}
 
@@ -21,7 +19,7 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexo = await DbFactory.CreateDbContextAsync();
 		return await contexo.Compras
-			.Include(l => l.Libro)
+			.Include(l => l.CompraDetalle)
 			.FirstOrDefaultAsync(p => p.CompraId == id);
 	}
 

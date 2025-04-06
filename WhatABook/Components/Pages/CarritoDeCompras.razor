@@ -1,0 +1,57 @@
+﻿@* componente estático para mostrar visualmente el carrito *@
+@page "/Carrito"
+<div class="container mt-4">
+    <h3>carrito de compras</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>libro</th>
+                <th>cantidad</th>
+                <th>precio unitario</th>
+                <th>subtotal</th>
+                <th>acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>el principito</td>
+                <td>2</td>
+                <td>$10.00</td>
+                <td>$20.00</td>
+                <td>
+                    <button class="btn btn-danger btn-sm">eliminar</button>
+                </td>
+            </tr>
+            <tr>
+                <td>cien años de soledad</td>
+                <td>1</td>
+                <td>$15.00</td>
+                <td>$15.00</td>
+                <td>
+                    <button class="btn btn-danger btn-sm">eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <h5>total: $35.00</h5>
+        <button class="btn btn-primary">finalizar compra</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int OrdenId { get; set; }
+
+    private Ordenes orden;
+    private List<OrdenesDetalle> detalles = new();
+    private double total = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}
+
