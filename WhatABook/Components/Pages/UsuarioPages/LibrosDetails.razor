@@ -1,6 +1,5 @@
 ﻿@page "/BookDetails/{id:int}"
 @inject LibrosService LibrosService
-@inject ComprasService ComprasService
 
 @using WhatABook.Models
 
@@ -21,9 +20,9 @@ else
             <p><strong>Descripción:</strong> @libro.Descripcion</p>
             <p><strong>Fecha de publicación:</strong> @libro.FechaPublicacion.ToShortDateString()</p>
 
-            @if (precioLibro.HasValue)
+            @if (libro.Precio > 0)
             {
-                <p><strong>Precio:</strong> $@precioLibro.Value</p>
+                <p><strong>Precio:</strong> $@libro.Precio</p>
             }
             else
             {
@@ -101,20 +100,11 @@ else
 @code {
     [Parameter]
     public int id { get; set; }
-
     private Libros? libro;
-    private double? precioLibro;
 
     protected override async Task OnInitializedAsync()
     {
-        var libros = await LibrosService.Listar(l => true);
-        libro = libros.FirstOrDefault(l => l.LibroId == id);
-
-        if (libro != null)
-        {
-            var compras = await ComprasService.Listar(c => c.LibroId == libro.LibroId);
-            var compra = compras.OrderByDescending(c => c.CompraId).FirstOrDefault();
-            precioLibro = compra?.PrecioVenta;
-        }
+        var todosLosLibros = await LibrosService.Listar();
+        libro = todosLosLibros.FirstOrDefault(l => l.LibroId == id);
     }
 }
