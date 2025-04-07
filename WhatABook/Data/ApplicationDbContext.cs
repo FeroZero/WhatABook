@@ -28,15 +28,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 			 new MetodosDePagos { MetodoPagoId = 2, Descripcion = "Tarjeta" }
 		);
 
-		modelBuilder.Entity<Generos>().HasData(
-			new Generos { GeneroId = 1, TipoGeneros = "Acción" },
-			new Generos { GeneroId = 2, TipoGeneros = "Aventura" },
-			new Generos { GeneroId = 3, TipoGeneros = "Ciencia Ficción" },
-			new Generos { GeneroId = 4, TipoGeneros = "Fantasía" },
-			new Generos { GeneroId = 5, TipoGeneros = "Romance" },
-			new Generos { GeneroId = 6, TipoGeneros = "Horror" },
-			new Generos { GeneroId = 7, TipoGeneros = "Literatura juvenil" },
-			new Generos { GeneroId = 8, TipoGeneros = "Poesía" }
-		);
+			modelBuilder.Entity<Generos>().HasData(
+				new Generos { GeneroId = 1, TipoGeneros = "Acción" },
+				new Generos { GeneroId = 2, TipoGeneros = "Aventura" },
+				new Generos { GeneroId = 3, TipoGeneros = "Ciencia Ficción" },
+				new Generos { GeneroId = 4, TipoGeneros = "Fantasía" },
+				new Generos { GeneroId = 5, TipoGeneros = "Romance" },
+				new Generos { GeneroId = 6, TipoGeneros = "Horror" },
+				new Generos { GeneroId = 7, TipoGeneros = "Literatura juvenil" },
+				new Generos { GeneroId = 8, TipoGeneros = "Poesía" }
+			);
 	}
 }
