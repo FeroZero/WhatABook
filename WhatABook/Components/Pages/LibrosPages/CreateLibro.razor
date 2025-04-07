@@ -49,55 +49,105 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label"><strong>Género</strong></label>
-                        <InputSelect class="form-select" @bind-value="libro.GeneroId">
-                            <option value="0">Seleccione un Género</option>
-                            @foreach (var genero in ListaGeneros)
-                            {
-                                <option value="@genero.GeneroId">@genero.TipoGeneros</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => libro.GeneroId" />
-                    </div>
-
-                    <div class="col-md-6">
                         <label class="form-label"><strong>Imagen (URL)</strong></label>
                         <InputText class="form-control" @bind-value="libro.ImagenUrl" placeholder="https://..." />
                         <ValidationMessage For="() => libro.ImagenUrl" />
                     </div>
 
-                </div>
-            </div>
+                    <div class="border border-success p-3 mt-3">
+                        <h4>Géneros del Libro</h4>
+                        <div class="row">
+                            <div class="col-auto input-group align-items-center">
+                                <InputSelect class="form-select" @bind-Value="detalle.GeneroId">
+                                    <option disabled value="0">--- Seleccione un género ---</option>
+                                    @foreach (var genero in ListaGeneros)
+                                    {
+                                        <option value="@genero.GeneroId">@genero.GeneroId -- @genero.TipoGeneros</option>
+                                    }
+                                </InputSelect>
+                                <button type="button" class="btn btn-success ms-2" @onclick="AgregarGenero">Agregar</button>
+                            </div>
+                        </div>
 
-            <div class="card-footer text-center">
-                <button type="button" class="btn btn-outline-secondary me-2" @onclick="Volver">
-                    <i class="bi bi-arrow-return-left"></i> Volver
-                </button>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-floppy"></i> Guardar
-                </button>
+                        <table class="table table-light mt-3">
+                            <thead class="table-striped">
+                                <tr class="text-center">
+                                    <th>Género</th>
+                                    <th>Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in libro.ListaGeneros)
+                                {
+                                    <tr class="text-center">
+                                        <td>@item.Genero?.TipoGeneros</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger bi bi-trash"
+                                                    @onclick="@(() => RemoverGenero(item))">
+                                                Remover
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer text-center">
+                    <button type="button" class="btn btn-outline-secondary me-2" @onclick="Volver">
+                        <i class="bi bi-arrow-return-left"></i> Volver
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-floppy"></i> Guardar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </EditForm>
 
 @code {
-    public Libros libro { get; set; } = new Libros();
-    public List<Generos> ListaGeneros { get; set; } = new List<Generos>();
+    public Libros libro { get; set; } = new();
+    public DetalleLibroGenero detalle { get; set; } = new();
+    public List<Generos> ListaGeneros { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ListaGeneros = await generosService.Listar(o => o.GeneroId > 0);
+        ListaGeneros = await generosService.Listar(g => g.GeneroId > 0);
     }
 
-    public async Task Guardar()
+    private async Task Guardar()
     {
         var resultado = await librosService.Guardar(libro);
         navigate.NavigateTo("/Libros/Index");
     }
 
-    public void Volver()
+    private void Volver()
     {
         navigate.NavigateTo("/Libros/Index");
+    }
+
+    private void AgregarGenero()
+    {
+        if (detalle.GeneroId == 0 || libro.ListaGeneros.Any(d => d.GeneroId == detalle.GeneroId))
+            return;
+
+        var generoSeleccionado = ListaGeneros.FirstOrDefault(g => g.GeneroId == detalle.GeneroId);
+        if (generoSeleccionado != null)
+        {
+            libro.ListaGeneros.Add(new DetalleLibroGenero
+                {
+                    GeneroId = generoSeleccionado.GeneroId,
+                    Genero = generoSeleccionado
+                });
+
+            detalle = new DetalleLibroGenero(); // Limpiar selección
+        }
+    }
+
+    private void RemoverGenero(DetalleLibroGenero item)
+    {
+        libro.ListaGeneros.Remove(item);
     }
 }
