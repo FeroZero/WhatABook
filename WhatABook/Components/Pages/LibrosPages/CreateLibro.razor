@@ -147,8 +147,9 @@
         }
     }
 
-    private void RemoverGenero(DetalleLibroGenero item)
+    private void RemoverGenero(DetalleLibroGenero detalleGenero)
     {
-        libro.ListaGeneros.Remove(item);
+        // Remueve el detalle de la lista local de géneros
+        libro.ListaGeneros.Remove(detalleGenero);
     }
 }

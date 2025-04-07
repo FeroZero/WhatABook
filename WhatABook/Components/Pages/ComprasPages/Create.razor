@@ -26,7 +26,8 @@
                         <h4>Libros</h4>
                         <div class="row">
                             <div class="col-auto input-group align-items-center">
-                                <InputSelect class="form-select" @bind-Value="Detalle.CompraId">
+                                <InputSelect class="form-select" @bind-Value="Detalle.LibroId">
+                                    >
                                     <option disabled value="0">--- Seleccione un libro ---</option>
                                     @foreach (var libro in ListaLibros)
                                     {
@@ -65,7 +66,7 @@
                                     @foreach (var detalle in compra.CompraDetalle)
                                     {
                                         <tr class="text-center">
-                                            <td>@detalle.Libro.Titulo</td>
+                                            <td>@detalle.Libro?.Titulo</td>
                                             <td>@detalle.Cantidad</td>
                                             <td>@detalle.PorcentajeGanancia</td>
                                             <td>@detalle.PrecioCompra</td>
@@ -119,13 +120,16 @@
 
     public async Task Sumar()
     {
-        foreach (var libro in compra.CompraDetalle)
-        {
-            var BuscarLibros = ListaLibros.FirstOrDefault(l => l.LibroId == libro.LibroId);
-            BuscarLibros.Cantidad += libro.Cantidad;
+        var libro = await libroService.Buscar(Detalle.LibroId);
+        Detalle.Libro = libro;
 
-            await libroService.Guardar(BuscarLibros);
-        }
+        compra.CompraDetalle.Add(Detalle);
+
+        libro.Cantidad += Detalle.Cantidad;
+        libro.Precio = Detalle.PrecioVenta;
+        await libroService.Guardar(libro);
+
+        Detalle = new ComprasDetalle();
     }
 
     public async Task RemoverDetalle(ComprasDetalle detalle)
