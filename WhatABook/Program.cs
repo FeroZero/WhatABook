@@ -48,6 +48,7 @@ namespace WhatABook
             builder.Services.AddScoped<LibrosService>();
 			builder.Services.AddScoped<GenerosService>();
 			builder.Services.AddScoped<ComprasService>();
+			builder.Services.AddScoped<OrdenesService>();
 
             async Task CrearUsuarioAdmin(IServiceProvider serviceProvider)
             {
