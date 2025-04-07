@@ -52,12 +52,11 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 			.Include(g => g.ListaGeneros)
 			.FirstOrDefaultAsync(l => l.LibroId == id);
 	}
-	public async Task<List<Libros>> Listar(Expression<Func<Libros, bool>> criterio)
+	public async Task<List<Libros>> Listar()
 	{
 		await using var context = await DbFactory.CreateDbContextAsync();
 		return await context.Libros
 			.Include(l => l.ListaGeneros)
-			.Where(criterio)
 			.ToListAsync();
 	}
 	public async Task<bool> ExisteLibro(string titulo, int id)
