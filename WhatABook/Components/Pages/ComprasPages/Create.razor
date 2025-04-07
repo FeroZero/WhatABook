@@ -8,14 +8,14 @@
 
 <EditForm model="compra" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-    <div class="container">
-        <div class="card shadow-lg">
-            <div class="card-header">
+    <div class="container mt-5">
+        <div class="card shadow-lg rounded-4">
+            <div class="card-header bg-dark text-white text-center rounded-top-4">
                 <div class="card-title">Crear Nueva Compra</div>
             </div>
 
             <div class="card-body">
-                <div class="row">
+                <div class="row g-4">
                     <div class="col-3 ms-5">
                         <label class="form-label"><strong>Título</strong></label>
                         <InputDate class="form-control" @bind-value="compra.Fecha"></InputDate>
@@ -41,7 +41,7 @@
                                 <label class="col-form-label input-group-text">% Ganancia</label>
                                 <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia" @onblur="CalcularPrecioVenta"></InputNumber>
 
-                                <label class="col-form-label input-group-text">Precio de Venta</label>
+                                <label class="col-form-label input-group-text">Precio de Compra</label>
                                 <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra" @onblur="CalcularPrecioVenta"></InputNumber>
 
                                 <label class="col-form-label input-group-text">Precio de Venta</label>
@@ -57,8 +57,9 @@
                                         <th>Libro</th>
                                         <th>Cantidad</th>
                                         <th>Ganancia</th>
-                                        <th>Precio de venta</th>
                                         <th>Precio de Compra</th>
+                                        <th>Precio de Venta</th>
+                                        <th>Total</th>
                                         <th>Remover</th>
                                     </tr>
                                 </thead>
@@ -68,9 +69,10 @@
                                         <tr class="text-center">
                                             <td>@detalle.Libro?.Titulo</td>
                                             <td>@detalle.Cantidad</td>
-                                            <td>@detalle.PorcentajeGanancia</td>
-                                            <td>@detalle.PrecioCompra</td>
-                                            <td>@detalle.PrecioVenta</td>
+                                            <td>@(detalle.PorcentajeGanancia.ToString("0.##")) %</td>
+                                            <td>$@detalle.PrecioCompra</td>
+                                            <td>$@detalle.PrecioVenta.ToString("N2")</td>
+                                            <td>$@((detalle.PrecioCompra * detalle.Cantidad).ToString("N2"))</td>
                                             <td>
                                                 <button type="button" @onclick="() => RemoverDetalle(detalle)" class="btn btn-outline-danger bi bi-trash">Remover</button>
                                             </td>
@@ -84,7 +86,7 @@
             </div>
 
             <div class="card-footer text-center">
-                <a href="/Libros/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
+                <a href="/Compras/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
                 <button type="submit" class="bi bi-floppy btn btn-outline-success">Guardar</button>
             </div>
         </div>
