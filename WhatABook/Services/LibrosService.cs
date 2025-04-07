@@ -23,18 +23,50 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 			.AnyAsync(p => p.LibroId == id);
 	}
 
-	private async Task<bool> Modificar(Libros libro)
+	public async Task<bool> Modificar(Libros libro)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 
-		// evitar que se inserten géneros existentes
-		foreach (var detalle in libro.ListaGeneros)
+		// Cargar el libro existente desde la base de datos
+		var libroExistente = await contexto.Libros
+			.Include(l => l.ListaGeneros)
+			.ThenInclude(dlg => dlg.Genero)
+			.FirstOrDefaultAsync(l => l.LibroId == libro.LibroId);
+
+		if (libroExistente == null)
+			return false; // Si no se encuentra, no hay nada que modificar
+
+		// Manejar géneros removidos
+		foreach (var detalleExistente in libroExistente.ListaGeneros.ToList())
 		{
-			if (detalle.Genero != null)
-				contexto.Entry(detalle.Genero).State = EntityState.Unchanged;
+			if (!libro.ListaGeneros.Any(d => d.GeneroId == detalleExistente.GeneroId))
+			{
+				// Marcar género removido como eliminado
+				contexto.Entry(detalleExistente).State = EntityState.Deleted;
+			}
 		}
 
-		contexto.Update(libro);
+		// Actualizar los géneros restantes
+		foreach (var nuevoDetalle in libro.ListaGeneros)
+		{
+			var generoExistente = await contexto.Generos
+				.FirstOrDefaultAsync(g => g.GeneroId == nuevoDetalle.GeneroId);
+
+			if (generoExistente != null)
+			{
+				nuevoDetalle.Genero = generoExistente; // Reutilizar instancia existente
+			}
+			else
+			{
+				contexto.Entry(nuevoDetalle).State = EntityState.Added; // Nuevo género
+			}
+		}
+
+		// Actualizar campos del libro principal
+		libroExistente.Titulo = libro.Titulo; // Ejemplo de actualización
+		libroExistente.ListaGeneros = libro.ListaGeneros;
+
+		// Guardar los cambios en la base de datos
 		return await contexto.SaveChangesAsync() > 0;
 	}
 
@@ -43,14 +75,16 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 
-		// evitar que se inserten géneros existentes
 		foreach (var detalle in libro.ListaGeneros)
 		{
 			if (detalle.Genero != null)
+			{
 				contexto.Entry(detalle.Genero).State = EntityState.Unchanged;
+			}
 		}
 
 		contexto.Libros.Add(libro);
+
 		return await contexto.SaveChangesAsync() > 0;
 	}
 
@@ -64,16 +98,18 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 
 	public async Task<Libros?> Buscar(int id)
 	{
-		await using var contexo = await DbFactory.CreateDbContextAsync();
-		return await contexo.Libros
-			.Include(g => g.ListaGeneros)
+		await using var contexto = await DbFactory.CreateDbContextAsync();
+		return await contexto.Libros
+			.Include(l => l.ListaGeneros)
 			.ThenInclude(g => g.Genero)
+			.AsNoTracking() // No rastrear las entidades cargadas
 			.FirstOrDefaultAsync(l => l.LibroId == id);
 	}
 	public async Task<List<Libros>> Listar()
 	{
 		await using var context = await DbFactory.CreateDbContextAsync();
 		return await context.Libros
+			.AsNoTracking()
 			.Include(l => l.ListaGeneros)
 			.ThenInclude(g => g.Genero)
 			.ToListAsync();
