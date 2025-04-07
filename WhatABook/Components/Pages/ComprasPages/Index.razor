@@ -1,5 +1,6 @@
 ﻿@page "/Compras/Index"
 @inject ComprasService comprasService
+@inject LibrosService libroService
 @inject NavigationManager navigate
 
 
@@ -26,13 +27,6 @@
                     @foreach (var libro in ListaCompras)
                     {
                         <tr>
-                            <td>@libro.LibroNombre</td>
-                            <td>@libro.PorcentajeGanancia</td>
-                            <td>@libro.Costo</td>
-                            <td>@libro.Cantidad</td>
-                            <td>@libro.PrecioVenta</td>
-                            <td>@libro.PrecioCompra</td>
-
                             <td>
                                 <a href="#" class="bi bi-pencil-square btn btn-outline-warning">Editar</a>
                                 <a href="#" class="bi bi-trash btn btn-outline-danger">Eliminar</a>
@@ -50,10 +44,12 @@
 </div>
 
 @code {
+    public List<Libros> ListaLibros { get; set; } = new List<Libros>();
     public List<Compras> ListaCompras { get; set; } = new List<Compras>();
+    public ComprasDetalle Detalle { get; set; } = new ComprasDetalle();
 
     protected override async Task OnInitializedAsync()
     {
-        ListaCompras = await comprasService.Listar(o => o.LibroId > 0);
+        ListaCompras = await comprasService.Listar();
     }
 }
