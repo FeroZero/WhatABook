@@ -2,6 +2,11 @@
 @inject LibrosService librosService
 @inject NavigationManager navigationManager
 @using WhatABook.Models
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
+
+
 
 @rendermode InteractiveServer
 <PageTitle>Eliminar Libro</PageTitle>
