@@ -35,16 +35,16 @@
                                 </InputSelect>
 
                                 <label class="col-form-label input-group-text">Cantidad</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.Cantidad"></InputNumber> 
+                                <InputNumber class="form-control" @bind-Value="Detalle.Cantidad" @onblur="CalcularPrecioVenta"></InputNumber>
 
                                 <label class="col-form-label input-group-text">% Ganancia</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia"></InputNumber>
+                                <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia" @onblur="CalcularPrecioVenta"></InputNumber>
 
                                 <label class="col-form-label input-group-text">Precio de Venta</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra"></InputNumber>
+                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra" @onblur="CalcularPrecioVenta"></InputNumber>
 
                                 <label class="col-form-label input-group-text">Precio de Venta</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioVenta"></InputNumber> 
+                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioVenta" readonly></InputNumber>
 
                                 <button type="button" class="btn btn-success bi bi-floppy" @onclick="Sumar">Agregar detalle</button>
                             </div>
@@ -98,15 +98,12 @@
 
     public async Task CalcularPrecioVenta()
     {
-        if(Detalle.PrecioCompra > 0 && Detalle.PorcentajeGanancia > 0)
-        {
+        var isValid = Detalle.PrecioCompra > 0 && Detalle.PorcentajeGanancia > 0 && Detalle.Cantidad > 0;
+        if (isValid)
             Detalle.PrecioVenta = Detalle.PrecioCompra + (Detalle.PrecioCompra * (Detalle.PorcentajeGanancia / 100));
-        }
+
         else
-        {
             Detalle.PrecioVenta = 0;
-        }
-        
     }
 
     protected override async Task OnInitializedAsync()
@@ -122,10 +119,10 @@
 
     public async Task Sumar()
     {
-        foreach(var libro in compra.CompraDetalle)
+        foreach (var libro in compra.CompraDetalle)
         {
             var BuscarLibros = ListaLibros.FirstOrDefault(l => l.LibroId == libro.LibroId);
-            // BuscarLibros.Cantidad += libro.Cantidad;
+            BuscarLibros.Cantidad += libro.Cantidad;
 
             await libroService.Guardar(BuscarLibros);
         }
