@@ -17,55 +17,59 @@
 
 <PageTitle>Register</PageTitle>
 
-<div class="container d-flex justify-content-center align-items-center vh-100"
-     style="background-image: url('https://images.unsplash.com/photo-1582087152266-3fbaf83bc952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
-            width: 100%;
-            padding-top: 80px;">
+<div style="
+    background-image: url('https://images.unsplash.com/photo-1582087152266-3fbaf83bc952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: calc(100vh - 80px); /* Ajusta la altura para que ocupe más espacio */
+    display: flex;
+    align-items: flex-start; /* Alinea el contenido hacia la parte superior */
+    padding-top: 40px; /* Espacio superior para el formulario */
+">
 
-    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 15px;">
-        <div class="text-center">
-            <h1 class="mb-4" style="color: #910a0a;">WhatABook <i class="bi bi-book"></i></h1>
-            <h2 class="h5 mb-3">Create a new account</h2>
-        </div>
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" />
-
-            <!-- Email Input -->
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" placeholder="Email" />
-                <label for="email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
+    <div class="container d-flex justify-content-center">
+        <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 15px; background-color: rgba(255, 255, 255, 0.95);">
+            <div class="text-center">
+                <h1 class="mb-4" style="color: #910a0a;">WhatABook <i class="bi bi-book"></i></h1>
+                <h2 class="h5 mb-3">Create a new account</h2>
             </div>
+            <StatusMessage Message="@Message" />
+            <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
 
-            <!-- Password Input -->
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password" />
-                <label for="password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
+                <!-- Email Input -->
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" placeholder="Email" />
+                    <label for="email">Email</label>
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password" />
+                    <label for="password">Password</label>
+                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                </div>
+
+                <!-- Confirm Password Input -->
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm Password" />
+                    <label for="confirm-password">Confirm Password</label>
+                    <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100" style="background-color: #910a0a; border: none; border-radius: 25px;">Register</button>
+            </EditForm>
+
+            <hr class="my-4">
+
+            <!-- Additional Links -->
+            <div class="text-center">
+                <p><a href="@(NavigationManager.GetUriWithQueryParameters("Account/Login", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" style="color: #910a0a;">Already have an account? Log in</a></p>
             </div>
-
-            <!-- Confirm Password Input -->
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm Password" />
-                <label for="confirm-password">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary w-100" style="background-color: #910a0a; border: none; border-radius: 25px;">Register</button>
-        </EditForm>
-
-        <hr class="my-4">
-
-        <!-- Additional Links -->
-        <div class="text-center">
-            <p><a href="@(NavigationManager.GetUriWithQueryParameters("Account/Login", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" style="color: #910a0a;">Already have an account? Log in</a></p>
         </div>
     </div>
 </div>
