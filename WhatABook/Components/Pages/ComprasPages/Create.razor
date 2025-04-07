@@ -111,7 +111,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListaLibros = await libroService.Listar(l => l.LibroId > 0);
+        ListaLibros = await libroService.Listar();
     }
 
     public async Task Guardar()
