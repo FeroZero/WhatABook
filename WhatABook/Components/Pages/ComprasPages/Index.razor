@@ -4,33 +4,36 @@
 @inject NavigationManager navigate
 
 
-<PageTitle>Lista de Libros</PageTitle>
+<PageTitle>Lista de Compras</PageTitle>
 
 <div class="container">
     <div class="card shadow-lg">
         <div class="card-header">
-            <div class="card-title">Lista de Libros</div>
+            <div class="card-title">Lista de Compras</div>
         </div>
 
         <div class="card-body">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Título</th>
-                        <th>Autor(es)</th>
-                        <th>Género</th>
-                        <th>Fecha de Publicación</th>
+                        <th>Fecha de compra</th>
+                        <th>Monto</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var libro in ListaCompras)
+                    @foreach (var compra in ListaCompras)
                     {
                         <tr>
+                            <td>@compra.Fecha.ToString("dd/MM/yyyy")</td>
                             <td>
-                                <a href="#" class="bi bi-pencil-square btn btn-outline-warning">Editar</a>
-                                <a href="#" class="bi bi-trash btn btn-outline-danger">Eliminar</a>
+                                @(
+                                    compra.CompraDetalle
+                                    .Sum(detalle => detalle.PrecioCompra * detalle.Cantidad)
+                                    .ToString("C")
+                                    )
                             </td>
+                            <td><a href="/Compras/Ver/@compra.CompraId" class="bi bi-pencil-square btn btn-outline-success">Ver</a></td>
                         </tr>
                     }
                 </tbody>
@@ -38,7 +41,7 @@
         </div>
 
         <div class="card-footer text-center">
-            <a href="/Libros/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
+            <a href="/Compras/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
         </div>
     </div>
 </div>
@@ -47,9 +50,11 @@
     public List<Libros> ListaLibros { get; set; } = new List<Libros>();
     public List<Compras> ListaCompras { get; set; } = new List<Compras>();
     public ComprasDetalle Detalle { get; set; } = new ComprasDetalle();
+    public double Total { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         ListaCompras = await comprasService.Listar();
+        ListaLibros = await libroService.Listar();
     }
 }

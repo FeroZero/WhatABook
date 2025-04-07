@@ -63,7 +63,11 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		}
 
 		// Actualizar campos del libro principal
-		libroExistente.Titulo = libro.Titulo; // Ejemplo de actualización
+		libroExistente.Titulo = libro.Titulo;
+		libroExistente.Autores = libro.Autores;
+		libroExistente.Descripcion = libro.Descripcion;
+		libroExistente.FechaPublicacion = libro.FechaPublicacion;
+		libroExistente.ImagenUrl = libro.ImagenUrl; // Ejemplo de actualización
 		libroExistente.ListaGeneros = libro.ListaGeneros;
 
 		// Guardar los cambios en la base de datos

@@ -12,6 +12,7 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Compras
 			.Include(d => d.CompraDetalle)
+			.ThenInclude(l => l.Libro)
 			.ToListAsync();
 	}
 
@@ -20,6 +21,7 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		await using var contexo = await DbFactory.CreateDbContextAsync();
 		return await contexo.Compras
 			.Include(l => l.CompraDetalle)
+			.ThenInclude(l => l.Libro)
 			.FirstOrDefaultAsync(p => p.CompraId == id);
 	}
 
