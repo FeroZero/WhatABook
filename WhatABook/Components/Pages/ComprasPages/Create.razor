@@ -1,5 +1,6 @@
 ﻿@page "/Compras/Create"
 @inject ComprasService comprasService
+@inject LibrosService libroService
 @inject NavigationManager navigate
 @rendermode InteractiveServer
 
@@ -17,35 +18,67 @@
                 <div class="row">
                     <div class="col-3 ms-5">
                         <label class="form-label"><strong>Título</strong></label>
-                        <InputText class="form-control" @bind-value="compra.LibroNombre"></InputText>
-                        <ValidationMessage For="() => compra.LibroNombre" />
+                        <InputDate class="form-control" @bind-value="compra.Fecha"></InputDate>
+                        <ValidationMessage For="() => compra.Fecha" />
                     </div>
 
-                    <div class="col-3">
-                        <label class="form-label"><strong>% Ganancia</strong></label>
-                        <InputNumber class="form-control" @bind-value="compra.PorcentajeGanancia"></InputNumber>
-                        <ValidationMessage For="() => compra.PorcentajeGanancia" />
+                    <div class="border border-success p-3 mt-3">
+                        <h4>Libros</h4>
+                        <div class="row">
+                            <div class="col-auto input-group align-items-center">
+                                <InputSelect class="form-select" @bind-Value="Detalle.CompraId">
+                                    <option disabled value="0">--- Seleccione un libro ---</option>
+                                    @foreach (var libro in ListaLibros)
+                                    {
+                                        <option value="@libro.LibroId">@libro.LibroId -- @libro.Titulo</option>
+                                    }
+                                </InputSelect>
+
+                                <label class="col-form-label input-group-text">Cantidad</label>
+                                <InputNumber class="form-control" @bind-Value="Detalle.Cantidad"></InputNumber> 
+
+                                <label class="col-form-label input-group-text">% Ganancia</label>
+                                <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia"></InputNumber>
+
+                                <label class="col-form-label input-group-text">Precio de Venta</label>
+                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra"></InputNumber>
+
+                                <label class="col-form-label input-group-text">Precio de Venta</label>
+                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioVenta"></InputNumber> 
+
+                                <button type="button" class="btn btn-success bi bi-floppy" @onclick="Sumar">Agregar detalle</button>
+                            </div>
+                        </div>
+                        <div>
+                            <table class="table table-light">
+                                <thead class="table-striped">
+                                    <tr class="text-center">
+                                        <th>Libro</th>
+                                        <th>Cantidad</th>
+                                        <th>Ganancia</th>
+                                        <th>Precio de venta</th>
+                                        <th>Precio de Compra</th>
+                                        <th>Remover</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detalle in compra.CompraDetalle)
+                                    {
+                                        <tr class="text-center">
+                                            <td>@detalle.Libro.Titulo</td>
+                                            <td>@detalle.Cantidad</td>
+                                            <td>@detalle.PorcentajeGanancia</td>
+                                            <td>@detalle.PrecioCompra</td>
+                                            <td>@detalle.PrecioVenta</td>
+                                            <td>
+                                                <button type="button" @onclick="() => RemoverDetalle(detalle)" class="btn btn-outline-danger bi bi-trash">Remover</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-
-                    <div class="col-3">
-                        <label class="form-label"><strong>Costo</strong></label>
-                        <InputNumber class="form-control" @bind-value="compra.Costo"></InputNumber>
-                        <ValidationMessage For="() => compra.Costo" />
-                    </div> 
-                    
-                    <div class="col-3">
-                        <label class="form-label"><strong>Cantidad</strong></label>
-                        <InputNumber class="form-control" @bind-value="compra.Cantidad"></InputNumber>
-                        <ValidationMessage For="() => compra.Cantidad" />
-                    </div>
-
-                    <div class="col-3">
-                        <label class="form-label"><strong>Precio de Venta</strong></label>
-                        <InputNumber class="form-control" @bind-value="compra.PrecioVenta readonly"></InputNumber>
-                        <ValidationMessage For="() => compra.PrecioVenta" />
-                    </div>
-
-
                 </div>
             </div>
 
@@ -59,14 +92,52 @@
 
 @code {
     public Compras compra { get; set; } = new Compras();
+    public List<Libros> ListaLibros { get; set; } = new List<Libros>();
+    public Libros Libros { get; set; } = new Libros();
+    public ComprasDetalle Detalle { get; set; } = new ComprasDetalle();
 
-    public void CalcularPrecioVenta()
+    public async Task CalcularPrecioVenta()
     {
-        compra.PrecioVenta = compra.Costo * (1 + compra.PorcentajeGanancia / 100);
+        if(Detalle.PrecioCompra > 0 && Detalle.PorcentajeGanancia > 0)
+        {
+            Detalle.PrecioVenta = Detalle.PrecioCompra + (Detalle.PrecioCompra * (Detalle.PorcentajeGanancia / 100));
+        }
+        else
+        {
+            Detalle.PrecioVenta = 0;
+        }
+        
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaLibros = await libroService.Listar(l => l.LibroId > 0);
+    }
+
     public async Task Guardar()
     {
         var resultado = await comprasService.Guardar(compra);
         navigate.NavigateTo("/Libros/Index");
+    }
+
+    public async Task Sumar()
+    {
+        foreach(var libro in compra.CompraDetalle)
+        {
+            var BuscarLibros = ListaLibros.FirstOrDefault(l => l.LibroId == libro.LibroId);
+            // BuscarLibros.Cantidad += libro.Cantidad;
+
+            await libroService.Guardar(BuscarLibros);
+        }
+    }
+
+    public async Task RemoverDetalle(ComprasDetalle detalle)
+    {
+        compra.CompraDetalle.Remove(detalle);
+        Detalle = detalle;
+
+        var libro = await libroService.Buscar(detalle.LibroId);
+
+        libro.Cantidad -= detalle.Cantidad;
     }
 }
