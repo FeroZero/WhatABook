@@ -39,7 +39,13 @@
                                 <tr>
                                     <td>@libro.Titulo</td>
                                     <td>@libro.Autores</td>
-                                    <td>@libro.Generos?.TipoGeneros</td>
+                                    <td>
+                                    @if (libro.ListaGeneros != null && libro.ListaGeneros.Any())
+                                    {
+                                        // Muestra todos los géneros relacionados con el libro
+                                        @string.Join(", ", libro.ListaGeneros.Select(dlg => dlg.Genero.TipoGeneros))
+                                    }
+                                    </td>
                                     <td>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
@@ -70,7 +76,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Listalibros = await librosService.Listar(o => o.LibroId > 0);
+        Listalibros = await librosService.Listar();
     }
 
     private void NavigateToEdit(int libroId)
@@ -85,7 +91,7 @@
         if (confirmDelete)
         {
             
-            Listalibros = await librosService.Listar(o => o.LibroId > 0);
+            Listalibros = await librosService.Listar();
         }
     }
 }

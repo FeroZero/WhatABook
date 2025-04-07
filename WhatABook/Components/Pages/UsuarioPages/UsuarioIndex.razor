@@ -61,12 +61,14 @@
     }
     else
     {
-        @foreach (var grupo in Libros.GroupBy(l => l.Generos!.TipoGeneros))
+        @foreach (var grupo in Libros
+       .SelectMany(l => l.ListaGeneros.Select(dlg => new { Libro = l, Genero = dlg.Genero.TipoGeneros }))
+       .GroupBy(lg => lg.Genero))
         {
             <div class="mb-5">
                 <h2 class="text-start">@grupo.Key</h2>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-4">
-                    @foreach (var libro in grupo)
+                    @foreach (var libro in grupo.Select(lg => lg.Libro))
                     {
                         <div class="col">
                             <div class="card h-100 text-center shadow-sm book-card d-flex flex-column">
@@ -75,8 +77,6 @@
                                     <h4 class="card-title">
                                         <a href="/BookDetails/@libro.LibroId" class="book-title-link">@libro.Titulo</a>
                                     </h4>
-                                    @* <p><strong>Precio:</strong> $@ObtenerPrecioVenta(libro.LibroId)</p> *@
-
                                     <button class="btn btn-primary w-100 btn-cart mt-auto" @onclick="() => AddToCart(libro)">
                                         <i class="bi bi-cart"></i> Agregar
                                     </button>
@@ -230,18 +230,18 @@
     private string selectedGenero { get; set; } = string.Empty;
     private bool filterApplied { get; set; } = false;
 
-    
-
     private List<string> GenerosUnicos => Libros
-        .Where(l => l.Generos != null)
-        .Select(l => l.Generos!.TipoGeneros)
-        .Distinct()
-        .ToList();
-
+     .Where(l => l.ListaGeneros != null && l.ListaGeneros.Any())
+     .SelectMany(l => l.ListaGeneros) // Aplana la colección de géneros
+     .Select(dlg => dlg.Genero.TipoGeneros) // Accede a TipoGeneros en lugar de Nombre
+     .Distinct()
+     .ToList();
+    
 
     protected override async Task OnInitializedAsync()
     {
-        Libros = await LibrosService.Listar(l => true); 
+        Libros = await LibrosService.Listar();
+
         
     }
 
@@ -266,10 +266,14 @@
             query = query.Where(l => l.Titulo.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
 
         if (!string.IsNullOrWhiteSpace(selectedGenero))
-            query = query.Where(l => l.Generos != null && l.Generos.TipoGeneros == selectedGenero);
+            query = query.Where(l => l.ListaGeneros != null &&
+                                     l.ListaGeneros.Any(dlg => dlg.Genero.TipoGeneros == selectedGenero));
 
         return query.ToList();
     }
+
+
+  
 
     private void AddToCart(Libros libro)
     {

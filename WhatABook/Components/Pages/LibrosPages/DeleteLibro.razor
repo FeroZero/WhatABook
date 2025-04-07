@@ -20,7 +20,14 @@
                 <li class="list-group-item"><strong>ID: </strong>@libro.LibroId</li>
                 <li class="list-group-item"><strong>Título: </strong>@libro.Titulo</li>
                 <li class="list-group-item"><strong>Autor(es): </strong>@libro.Autores</li>
-                <li class="list-group-item"><strong>Género: </strong>@libro.Generos?.TipoGeneros</li>
+                <li class="list-group-item">
+                    <strong>Género: </strong>
+                    @if (libro.ListaGeneros != null && libro.ListaGeneros.Any())
+                    {
+                        @string.Join(", ", libro.ListaGeneros.Select(dlg => dlg.Genero.TipoGeneros))
+                    }
+                    
+                </li>
                 <li class="list-group-item"><strong>Fecha de Publicación: </strong>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</li>
             </ul>
         </div>
