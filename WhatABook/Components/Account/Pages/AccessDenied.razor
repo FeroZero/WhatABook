@@ -1,8 +1,18 @@
 ﻿@page "/Account/AccessDenied"
 
-<PageTitle>Access denied</PageTitle>
+<PageTitle>Acceso Denegado</PageTitle>
 
-<header>
-    <h1 class="text-danger">Access denied</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-danger text-white rounded-top-4">
+            <h2 class="fw-bold mb-0"><i class="bi bi-shield-lock-fill me-2"></i>¡Acceso Denegado!</h2>
+        </div>
+        <div class="card-body">
+            <p class="fs-5 text-secondary">Lo sentimos, no tienes permiso para acceder a esta sección de WhatABook.</p>
+            <p class="text-muted">Si crees que esto es un error, por favor contacta al administrador del sistema.</p>
+            <a href="/" class="btn btn-outline-danger mt-3">
+                <i class="bi bi-house-door-fill me-1"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+</div>
