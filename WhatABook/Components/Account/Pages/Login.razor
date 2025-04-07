@@ -93,10 +93,23 @@
     public async Task LoginUser()
     {
         var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
-            RedirectManager.RedirectTo("/Usuario/Index");
+
+            // Buscar el usuario logueado
+            var user = await SignInManager.UserManager.FindByEmailAsync(Input.Email);
+
+            // Verificar si es el admin por su correo
+            if (user != null && user.Email == "Admin@gmail.com")
+            {
+                RedirectManager.RedirectTo("/admin/Index");
+            }
+            else
+            {
+                RedirectManager.RedirectTo("/Usuario/Index");
+            }
         }
         else if (result.RequiresTwoFactor)
         {
@@ -114,6 +127,7 @@
             errorMessage = "Error: Invalid login attempt.";
         }
     }
+
 
     private sealed class InputModel
     {

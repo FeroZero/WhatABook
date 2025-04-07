@@ -1,8 +1,14 @@
 ﻿@page "/admin/Index"
 @inject NavigationManager navigate
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
+
 
 <PageTitle>Panel de Administración</PageTitle>
+
+
 
 <div class="container py-5">
     <div class="text-center mb-5">

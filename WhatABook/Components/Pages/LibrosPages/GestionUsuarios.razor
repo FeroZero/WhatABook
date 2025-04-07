@@ -3,6 +3,9 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Gestión de Usuarios</PageTitle>
 
