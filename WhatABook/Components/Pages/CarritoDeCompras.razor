@@ -1,57 +1,150 @@
-﻿@* componente estático para mostrar visualmente el carrito *@
-@page "/Carrito"
+﻿@page "/Carrito"
+@inject OrdenesService ordenesService
+@inject LibrosService libroService
+@inject ApplicationDbContext context
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Carrito de Compras</PageTitle>
+
 <div class="container mt-4">
-    <h3>carrito de compras</h3>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>libro</th>
-                <th>cantidad</th>
-                <th>precio unitario</th>
-                <th>subtotal</th>
-                <th>acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>el principito</td>
-                <td>2</td>
-                <td>$10.00</td>
-                <td>$20.00</td>
-                <td>
-                    <button class="btn btn-danger btn-sm">eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>cien años de soledad</td>
-                <td>1</td>
-                <td>$15.00</td>
-                <td>$15.00</td>
-                <td>
-                    <button class="btn btn-danger btn-sm">eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="text-end">
-        <h5>total: $35.00</h5>
-        <button class="btn btn-primary">finalizar compra</button>
+    <div class="row justify-content-center">
+        <!-- Sidebar con Carrito -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <strong style="font-size: 20px;">Tu Carrito (@Ordenes.ordenes.Count())</strong>
+                </div>
+                <div class="card-body sidebar-body">
+                    @if (Ordenes.ordenes.Count() == 0)
+                    {
+                        <p class="text-center"><strong>No hay productos en tu carrito.</strong></p>
+                    }
+                    else
+                    {
+                        @foreach (var detalle in Ordenes.ordenes)
+                        {
+                            <div class="espacioProducto mb-3" style="font-size: 14px;">
+                                @if (detalle.Libros != null)
+                                {
+                                    <div class="d-flex align-items-center">
+                                        <img src="@detalle.Libros.ImagenUrl" alt="Producto" class="product-image me-3" />
+                                        <div class="product-info w-100">
+                                            <h5 class="product-title">@detalle.Libros.Titulo</h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p class="product-price mt-3">
+                                                    <br />
+                                                    <strong>@((detalle.Cantidad * detalle.Libros.Precio).ToString("C"))</strong>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong>@Ordenes.ordenes.Sum(x => x.Libros.Precio * x.Libros.Cantidad).ToString("C")</strong>
+                    </div>
+                    <div class="text-center mt-3">
+@*                         <button type="button" class="btn btn-primary w-100" @onclick="ContinuarPedido"><strong>Continuar</strong></button> *@
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-@code {
-    [Parameter]
-    public int OrdenId { get; set; }
+<style>
+    .sidebar-body {
+    max-height: 400px;
+    overflow-y: auto;
+    }
 
-    private Ordenes orden;
-    private List<OrdenesDetalle> detalles = new();
-    private double total = 0;
+    .product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    }
 
-    protected override async Task OnInitializedAsync()
+    .product-title {
+    font-size: 16px;
+    font-weight: bold;
+    }
+
+    .espacioProducto {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    }
+
+    .btn-round {
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-size: 14px;
+    }
+
+    .btn-sm {
+    padding: 5px 10px;
+    }
+
+    .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    }
+
+    .btn-danger:hover {
+    background-color: #c82333;
+    }
+
+    .btn-primary {
+    background-color: #007bff;
+    color: white;
+    }
+
+    .btn-primary:hover {
+    background-color: #0056b3;
+    }
+
+    .btnAgregar {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    }
+
+    .btnAgregar:hover {
+    background-color: #218838;
+    }
+</style>
+
+@code
+{
+    public Ordenes Ordenes { get; set; } = new Ordenes();
+    public List<OrdenesDetalle> Detalle { get; set; } = new List<OrdenesDetalle>();
+
+    public async Task Agregar()
     {
-
+        foreach (var detalle in Detalle)
+        {
+            // Cargar el producto sin rastrear para evitar conflictos
+            var producto = await libroService.Buscar(detalle.LibroId);
+            if (producto != null)
+            {
+                // Verificar si el producto ya está siendo rastreado
+                var libroNuevo = context.ChangeTracker.Entries<Libros>().FirstOrDefault(e => e.Entity.LibroId == producto.LibroId)?.Entity;
+                if (libroNuevo != null)
+                {
+                    detalle.Libros = libroNuevo;
+                }
+                else
+                {
+                    detalle.Libros = producto;
+                    context.Entry(producto).State = EntityState.Unchanged;
+                }
+            }
+            Ordenes.ordenes.Add(detalle);
+        }
     }
 }
-
