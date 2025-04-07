@@ -7,11 +7,10 @@ namespace WhatABook.Services;
 
 public class GenerosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 {
-	public async Task<List<Generos>> Listar(Expression<Func<Generos, bool>> criterio)
+	public async Task<List<Generos>> Listar()
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.Generos
-			.Where(criterio)
 			.ToListAsync();
 	}
 
