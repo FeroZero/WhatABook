@@ -4,10 +4,23 @@
 <div class="navbar navbar-expand-lg fixed-top custom-navbar" id="NavigationBar">
     <div class="container-fluid">
         <!-- Logo con ícono y texto -->
-        <a class="navbar-brand d-flex align-items-center" href="" style="font-family: 'Permanent Marker', sans-serif; color: #FFFFFF; font-weight: bold;">
+        <a class="navbar-brand d-flex align-items-center" style="font-family: 'Permanent Marker', sans-serif; color: #FFFFFF; font-weight: bold;">
             <span>WhatABook</span>
             <i class="bi bi-book ms-2"></i>
         </a>
+        <!-- Botón hamburguesa para cerrar sesión -->
+        <div class="dropdown ms-auto">
+            <button class="btn text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-list fs-2"></i> <!-- Ícono de tres rayas -->
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item text-danger" href="/">
+                        <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
         <!-- Botón de colapso para dispositivos móviles -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
