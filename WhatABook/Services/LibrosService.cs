@@ -26,13 +26,30 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	private async Task<bool> Modificar(Libros libro)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
+
+		// evitar que se inserten géneros existentes
+		foreach (var detalle in libro.ListaGeneros)
+		{
+			if (detalle.Genero != null)
+				contexto.Entry(detalle.Genero).State = EntityState.Unchanged;
+		}
+
 		contexto.Update(libro);
 		return await contexto.SaveChangesAsync() > 0;
 	}
 
+
 	private async Task<bool> Insertar(Libros libro)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
+
+		// evitar que se inserten géneros existentes
+		foreach (var detalle in libro.ListaGeneros)
+		{
+			if (detalle.Genero != null)
+				contexto.Entry(detalle.Genero).State = EntityState.Unchanged;
+		}
+
 		contexto.Libros.Add(libro);
 		return await contexto.SaveChangesAsync() > 0;
 	}
@@ -50,6 +67,7 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		await using var contexo = await DbFactory.CreateDbContextAsync();
 		return await contexo.Libros
 			.Include(g => g.ListaGeneros)
+			.ThenInclude(g => g.Genero)
 			.FirstOrDefaultAsync(l => l.LibroId == id);
 	}
 	public async Task<List<Libros>> Listar()
@@ -57,6 +75,7 @@ public class LibrosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		await using var context = await DbFactory.CreateDbContextAsync();
 		return await context.Libros
 			.Include(l => l.ListaGeneros)
+			.ThenInclude(g => g.Genero)
 			.ToListAsync();
 	}
 	public async Task<bool> ExisteLibro(string titulo, int id)
