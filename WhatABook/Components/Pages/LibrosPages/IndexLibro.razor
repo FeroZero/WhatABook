@@ -40,11 +40,10 @@
                                     <td>@libro.Titulo</td>
                                     <td>@libro.Autores</td>
                                     <td>
-                                    @if (libro.ListaGeneros != null && libro.ListaGeneros.Any())
-                                    {
-                                        // Muestra todos los géneros relacionados con el libro
-                                        @string.Join(", ", libro.ListaGeneros.Select(dlg => dlg.Genero.TipoGeneros))
-                                    }
+                                        @foreach (var detalle in libro.ListaGeneros)
+                                        {
+                                            <span>@detalle.Genero?.TipoGeneros</span> @* Muestra el nombre del género *@
+                                        }
                                     </td>
                                     <td>@libro.FechaPublicacion.ToString("dd/MM/yyyy")</td>
                                     <td>
@@ -76,22 +75,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Cargar los libros con sus géneros relacionados
         Listalibros = await librosService.Listar();
-    }
-
-    private void NavigateToEdit(int libroId)
-    {
-        navigate.NavigateTo($"/Libros/Edit/{libroId}");
-    }
-
-    private async Task DeleteLibro(int libroId)
-    {
-        
-        bool confirmDelete = await Task.FromResult(true); 
-        if (confirmDelete)
-        {
-            
-            Listalibros = await librosService.Listar();
-        }
     }
 }

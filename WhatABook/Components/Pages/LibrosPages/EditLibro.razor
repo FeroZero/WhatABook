@@ -1,6 +1,7 @@
 ﻿@page "/Libros/Edit/{LibroId:int}"
 @inject LibrosService librosService
 @inject GenerosService generosService
+@inject ComprasService comprasService
 @inject NavigationManager navigate
 @rendermode InteractiveServer
 
@@ -9,28 +10,29 @@
 <EditForm Model="libro" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div class="container mt-5">
-        <div class="card shadow-lg">
-            <div class="card-header bg-dark text-white text-center">
-                <h3><strong>Editar Libro</strong></h3>
+        <div class="card shadow-lg rounded-4">
+            <div class="card-header bg-dark text-white text-center rounded-top-4">
+                <h3><strong>Crear Nuevo Libro</strong></h3>
             </div>
 
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                <div class="row g-4">
+
+                    <div class="col-md-6">
                         <label class="form-label"><strong>Título</strong></label>
-                        <InputText class="form-control" @bind-value="libro.Titulo" placeholder="Ingrese el título"></InputText>
+                        <InputText class="form-control" @bind-value="libro.Titulo" placeholder="Ingrese el título" />
                         <ValidationMessage For="() => libro.Titulo" />
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="form-label"><strong>Autor(es)</strong></label>
-                        <InputText class="form-control" @bind-value="libro.Autores" placeholder="Ingrese el autor(es)"></InputText>
+                        <InputText class="form-control" @bind-value="libro.Autores" placeholder="Ingrese el autor o autores" />
                         <ValidationMessage For="() => libro.Autores" />
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="form-label"><strong>Descripción</strong></label>
-                        <InputTextArea class="form-control" @bind-value="libro.Descripcion" rows="3" placeholder="Ingrese la descripción"></InputTextArea>
+                        <InputTextArea class="form-control" @bind-value="libro.Descripcion" placeholder="Ingrese una breve descripción" rows="3" />
                         <ValidationMessage For="() => libro.Descripcion" />
                     </div>
 
@@ -38,41 +40,68 @@
                         <label class="form-label"><strong>Precio de Venta</strong></label>
                         <InputNumber class="form-control" @bind-Value="compras.PrecioVenta" placeholder="Ingrese precio" step="0.01" />
                         <ValidationMessage For="() => compras.PrecioVenta" />
-                    </div
- *@
-                    <div class="col-md-6 mb-3">
+                     </div *@
+
+                    <div class="col-md-6">
                         <label class="form-label"><strong>Fecha de Publicación</strong></label>
-                        <InputDate class="form-control" @bind-value="libro.FechaPublicacion"></InputDate>
+                        <InputDate class="form-control" @bind-value="libro.FechaPublicacion" />
                         <ValidationMessage For="() => libro.FechaPublicacion" />
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label"><strong>Género</strong></label>
-                        <InputSelect class="form-select" @bind-value="libro.ListaGeneros">
-                            <option value="0">Seleccione un Género</option>
-                            @foreach (var genero in ListaGeneros)
-                            {
-                                <option value="@genero.GeneroId">@genero.TipoGeneros</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => libro.ListaGeneros" />
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label"><strong>Imagen</strong></label>
-                        <InputText class="form-control" @bind-value="libro.ImagenUrl" placeholder="Ingrese la URL de la imagen"></InputText>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Imagen (URL)</strong></label>
+                        <InputText class="form-control" @bind-value="libro.ImagenUrl" placeholder="https://..." />
                         <ValidationMessage For="() => libro.ImagenUrl" />
                     </div>
-                </div>
-            </div>
 
-            <div class="card-footer text-center">
-                <button type="button" class="btn btn-outline-primary" @onclick="Volver">
-                    <i class="bi bi-arrow-return-left"></i> Volver
-                </button>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-pencil"></i> Actualizar
-                </button>
+                    <div class="border border-success p-3 mt-3">
+                        <h4>Géneros del Libro</h4>
+                        <div class="row">
+                            <div class="col-auto input-group align-items-center">
+                                <InputSelect class="form-select" @bind-Value="Detalle.GeneroId">
+                                    <option disabled value="0">--- Seleccione un género ---</option>
+                                    @foreach (var genero in ListaGeneros)
+                                    {
+                                        <option value="@genero.GeneroId">@genero.GeneroId -- @genero.TipoGeneros</option>
+                                    }
+                                </InputSelect>
+                                <button type="button" class="btn btn-success ms-2" @onclick="AgregarGenero">Agregar</button>
+                            </div>
+                        </div>
+
+                        <table class="table table-light mt-3">
+                            <thead class="table-striped">
+                                <tr class="text-center">
+                                    <th>Género</th>
+                                    <th>Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in libro.ListaGeneros)
+                                {
+                                    <tr class="text-center">
+                                        <td>@item.Genero?.TipoGeneros</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger bi bi-trash"
+                                            @onclick="@(() => RemoverGenero(item))">
+                                                Remover
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer text-center">
+                    <button type="button" class="btn btn-outline-secondary me-2" @onclick="Volver">
+                        <i class="bi bi-arrow-return-left"></i> Volver
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-floppy"></i> Guardar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -81,23 +110,48 @@
 @code {
     [Parameter]
     public int LibroId { get; set; }
-    public Libros libro { get; set; } = new Libros();
-    public List<Generos> ListaGeneros { get; set; } = new List<Generos>();
+    public Libros libro { get; set; } = new();
+    public DetalleLibroGenero Detalle { get; set; } = new();
+    public List<Generos> ListaGeneros { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        libro = await librosService.Buscar(LibroId) ?? new Libros();
-        ListaGeneros = await generosService.Listar(o => o.GeneroId > 0);
+        libro = await librosService.Buscar(LibroId);
+        ListaGeneros = await generosService.Listar();
     }
 
-    public async Task Guardar()
+    private async Task Guardar()
     {
         var resultado = await librosService.Guardar(libro);
         navigate.NavigateTo("/Libros/Index");
     }
 
-    public void Volver()
+    private void Volver()
     {
         navigate.NavigateTo("/Libros/Index");
+    }
+
+    private void AgregarGenero()
+    {
+        if (Detalle.GeneroId > 0)
+        {
+            var generoSeleccionado = ListaGeneros.FirstOrDefault(g => g.GeneroId == Detalle.GeneroId);
+
+            if (generoSeleccionado != null && !libro.ListaGeneros.Any(d => d.GeneroId == Detalle.GeneroId))
+            {
+                var nuevoDetalle = new DetalleLibroGenero
+                    {
+                        GeneroId = Detalle.GeneroId,
+                        Genero = generoSeleccionado
+                    };
+
+                libro.ListaGeneros.Add(nuevoDetalle);
+            }
+        }
+    }
+
+    private void RemoverGenero(DetalleLibroGenero item)
+    {
+        libro.ListaGeneros.Remove(item);
     }
 }

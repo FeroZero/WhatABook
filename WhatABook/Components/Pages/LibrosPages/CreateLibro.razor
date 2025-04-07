@@ -58,7 +58,7 @@
                         <h4>Géneros del Libro</h4>
                         <div class="row">
                             <div class="col-auto input-group align-items-center">
-                                <InputSelect class="form-select" @bind-Value="detalle.GeneroId">
+                                <InputSelect class="form-select" @bind-Value="Detalle.GeneroId">
                                     <option disabled value="0">--- Seleccione un género ---</option>
                                     @foreach (var genero in ListaGeneros)
                                     {
@@ -109,12 +109,12 @@
 
 @code {
     public Libros libro { get; set; } = new();
-    public DetalleLibroGenero detalle { get; set; } = new();
+    public DetalleLibroGenero Detalle { get; set; } = new();
     public List<Generos> ListaGeneros { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ListaGeneros = await generosService.Listar(g => g.GeneroId > 0);
+        ListaGeneros = await generosService.Listar();
     }
 
     private async Task Guardar()
@@ -130,19 +130,20 @@
 
     private void AgregarGenero()
     {
-        if (detalle.GeneroId == 0 || libro.ListaGeneros.Any(d => d.GeneroId == detalle.GeneroId))
-            return;
-
-        var generoSeleccionado = ListaGeneros.FirstOrDefault(g => g.GeneroId == detalle.GeneroId);
-        if (generoSeleccionado != null)
+        if (Detalle.GeneroId > 0)
         {
-            libro.ListaGeneros.Add(new DetalleLibroGenero
-                {
-                    GeneroId = generoSeleccionado.GeneroId,
-                    Genero = generoSeleccionado
-                });
+            var generoSeleccionado = ListaGeneros.FirstOrDefault(g => g.GeneroId == Detalle.GeneroId);
 
-            detalle = new DetalleLibroGenero(); // Limpiar selección
+            if (generoSeleccionado != null && !libro.ListaGeneros.Any(d => d.GeneroId == Detalle.GeneroId))
+            {
+                var nuevoDetalle = new DetalleLibroGenero
+                    {
+                        GeneroId = Detalle.GeneroId,
+                        Genero = generoSeleccionado
+                    };
+
+                libro.ListaGeneros.Add(nuevoDetalle);
+            }
         }
     }
 
