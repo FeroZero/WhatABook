@@ -3,91 +3,121 @@
 @inject LibrosService libroService
 @inject NavigationManager navigate
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Crear Compra</PageTitle>
 
 <EditForm model="compra" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-    <div class="container mt-5">
+
+    <div class="container py-4">
         <div class="card shadow-lg rounded-4">
             <div class="card-header bg-dark text-white text-center rounded-top-4">
-                <div class="card-title">Crear Nueva Compra</div>
+                <h4 class="mb-0"><i class="bi bi-cart-plus me-2"></i>Crear Nueva Compra</h4>
             </div>
 
-            <div class="card-body">
-                <div class="row g-4">
-                    <div class="col-3 ms-5">
-                        <label class="form-label"><strong>Título</strong></label>
-                        <InputDate class="form-control" @bind-value="compra.Fecha"></InputDate>
+            <div class="card-body bg-light">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold"> Fecha</label>
+                        <InputDate class="form-control" @bind-value="compra.Fecha" />
                         <ValidationMessage For="() => compra.Fecha" />
                     </div>
+                </div>
 
-                    <div class="border border-success p-3 mt-3">
-                        <h4>Libros</h4>
-                        <div class="row">
-                            <div class="col-auto input-group align-items-center">
-                                <InputSelect class="form-select" @bind-Value="Detalle.LibroId">
-                                    >
-                                    <option disabled value="0">--- Seleccione un libro ---</option>
-                                    @foreach (var libro in ListaLibros)
-                                    {
-                                        <option value="@libro.LibroId">@libro.LibroId -- @libro.Titulo</option>
-                                    }
-                                </InputSelect>
-
-                                <label class="col-form-label input-group-text">Cantidad</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.Cantidad" @onblur="CalcularPrecioVenta"></InputNumber>
-
-                                <label class="col-form-label input-group-text">% Ganancia</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia" @onblur="CalcularPrecioVenta"></InputNumber>
-
-                                <label class="col-form-label input-group-text">Precio de Compra</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra" @onblur="CalcularPrecioVenta"></InputNumber>
-
-                                <label class="col-form-label input-group-text">Precio de Venta</label>
-                                <InputNumber class="form-control" @bind-Value="Detalle.PrecioVenta" readonly></InputNumber>
-
-                                <button type="button" class="btn btn-success bi bi-floppy" @onclick="Sumar">Agregar detalle</button>
-                            </div>
+                <div class="border border-success p-4 rounded-3 bg-white shadow-sm">
+                    <h5 class="mb-3">Agregar Libros</h5>
+                    <div class="row gy-3 gx-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label"> Libro</label>
+                            <InputSelect class="form-select" @bind-Value="Detalle.LibroId">
+                                <option disabled value="0">--- Seleccione un libro ---</option>
+                                @foreach (var libro in ListaLibros)
+                                {
+                                    <option value="@libro.LibroId">@libro.LibroId -- @libro.Titulo</option>
+                                }
+                            </InputSelect>
                         </div>
-                        <div>
-                            <table class="table table-light">
-                                <thead class="table-striped">
-                                    <tr class="text-center">
-                                        <th>Libro</th>
-                                        <th>Cantidad</th>
-                                        <th>Ganancia</th>
-                                        <th>Precio de Compra</th>
-                                        <th>Precio de Venta</th>
-                                        <th>Total</th>
-                                        <th>Remover</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var detalle in compra.CompraDetalle)
-                                    {
-                                        <tr class="text-center">
-                                            <td>@detalle.Libro?.Titulo</td>
-                                            <td>@detalle.Cantidad</td>
-                                            <td>@(detalle.PorcentajeGanancia.ToString("0.##")) %</td>
-                                            <td>$@detalle.PrecioCompra</td>
-                                            <td>$@detalle.PrecioVenta.ToString("N2")</td>
-                                            <td>$@((detalle.PrecioCompra * detalle.Cantidad).ToString("N2"))</td>
-                                            <td>
-                                                <button type="button" @onclick="() => RemoverDetalle(detalle)" class="btn btn-outline-danger bi bi-trash">Remover</button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+
+                        <div class="col-md-2">
+                            <label class="form-label"> Cantidad</label>
+                            <InputNumber class="form-control" @bind-Value="Detalle.Cantidad" @onblur="CalcularPrecioVenta" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label"> % Ganancia</label>
+                            <InputNumber class="form-control" @bind-Value="Detalle.PorcentajeGanancia" @onblur="CalcularPrecioVenta" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label"> Compra</label>
+                            <InputNumber class="form-control" @bind-Value="Detalle.PrecioCompra" @onblur="CalcularPrecioVenta" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label"> Venta</label>
+                            <InputNumber class="form-control bg-light" @bind-Value="Detalle.PrecioVenta" readonly />
+                        </div>
+
+                        <div class="col-md-12 text-end mt-2">
+                            <button type="button" class="btn btn-outline-success rounded-pill px-4" @onclick="Sumar">
+                                <i class="bi bi-plus-circle me-1"></i> Agregar a la compra
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                @if (compra.CompraDetalle.Any())
+                {
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded-3">
+                            <thead class="table-success">
+                                <tr>
+                                    <th> Libro</th>
+                                    <th> Cantidad</th>
+                                    <th> Ganancia</th>
+                                    <th> Compra</th>
+                                    <th> Venta</th>
+                                    <th> Total</th>
+                                    <th> Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detalle in compra.CompraDetalle)
+                                {
+                                    <tr>
+                                        <td>@detalle.Libro?.Titulo</td>
+                                        <td>@detalle.Cantidad</td>
+                                        <td>@(detalle.PorcentajeGanancia.ToString("0.##"))%</td>
+                                        <td>$@detalle.PrecioCompra</td>
+                                        <td>$@detalle.PrecioVenta.ToString("N2")</td>
+                                        <td>$@((detalle.PrecioCompra * detalle.Cantidad).ToString("N2"))</td>
+                                        <td>
+                                            <button type="button" @onclick="() => RemoverDetalle(detalle)" class="btn btn-outline-danger btn-sm rounded-pill">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted mt-3 fst-italic">Aún no has agregado ningún libro.</div>
+                }
             </div>
 
-            <div class="card-footer text-center">
-                <a href="/Compras/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
-                <button type="submit" class="bi bi-floppy btn btn-outline-success">Guardar</button>
+            <div class="card-footer text-end bg-white rounded-bottom-4">
+                <a href="/Compras/Index" class="btn btn-outline-secondary rounded-pill px-4 me-2">
+                    <i class="bi bi-arrow-left me-1"></i> Volver
+                </a>
+                <button type="submit" class="btn btn-success rounded-pill px-4">
+                    <i class="bi bi-floppy-fill me-1"></i> Guardar Compra
+                </button>
             </div>
         </div>
     </div>
@@ -104,7 +134,6 @@
         var isValid = Detalle.PrecioCompra > 0 && Detalle.PorcentajeGanancia > 0 && Detalle.Cantidad > 0;
         if (isValid)
             Detalle.PrecioVenta = Detalle.PrecioCompra + (Detalle.PrecioCompra * (Detalle.PorcentajeGanancia / 100));
-
         else
             Detalle.PrecioVenta = 0;
     }
@@ -117,7 +146,7 @@
     public async Task Guardar()
     {
         var resultado = await comprasService.Guardar(compra);
-        navigate.NavigateTo("/Libros/Index");
+        navigate.NavigateTo("/Compras/Index");
     }
 
     public async Task Sumar()
@@ -140,7 +169,6 @@
         Detalle = detalle;
 
         var libro = await libroService.Buscar(detalle.LibroId);
-
         libro.Cantidad -= detalle.Cantidad;
     }
 }

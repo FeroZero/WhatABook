@@ -1,53 +1,66 @@
 ﻿@page "/Compras/Ver/{CompraId:int}"
 @inject ComprasService comprasService
-@inject LibrosService libroService
 @inject NavigationManager navigate
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
 
-<PageTitle>Ver Compra</PageTitle>
+@attribute [Authorize(Roles = "Admin")]
+
+
+<PageTitle>Detalle de Compra</PageTitle>
 
 <div class="container mt-5">
-    <div class="card shadow-lg rounded-4">
+    <div class="card shadow-lg rounded-4 border-0">
         <div class="card-header bg-dark text-white text-center rounded-top-4">
-            <div class="card-title">Ver</div>
+            <h3 class="mb-0"><i class="bi bi-eye-fill me-2"></i>Detalle de la Compra</h3>
         </div>
 
         <div class="card-body">
-            <div class="card-subtitle text-center">@compra.Fecha.ToString("dd/MM/yyyy")</div>
-            <h4 class="text-center"><strong>Id:</strong> @compra.CompraId</h4>
-            <div class="row g-4">
-                <div class="border">
-                    <table class="table table-light">
-                        <thead class="table-striped">
-                            <tr class="text-center">
-                                <th>Libro</th>
-                                <th>Cantidad</th>
-                                <th>Ganancia</th>
-                                <th>Precio de venta</th>
-                                <th>Precio de Compra</th>
-                                <th>Total</th>
+            <div class="text-center mb-3">
+                <span class="badge bg-secondary fs-5 px-4 py-2">
+                    <strong>Fecha:</strong> @compra.Fecha.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+
+            <div class="text-center mb-4">
+                <h5><strong>ID de Compra:</strong> @compra.CompraId</h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center shadow-sm rounded-3">
+                    <thead class="table-dark text-white">
+                        <tr>
+                            <th>Libro</th>
+                            <th>Cantidad</th>
+                            <th>Ganancia (%)</th>
+                            <th>Precio Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-light">
+                        @foreach (var detalle in compra.CompraDetalle)
+                        {
+                            <tr>
+                                <td>@detalle.Libro?.Titulo</td>
+                                <td>@detalle.Cantidad</td>
+                                <td>@detalle.PorcentajeGanancia.ToString("0.##")%</td>
+                                <td>$@detalle.PrecioCompra.ToString("N2")</td>
+                                <td>$@detalle.PrecioVenta.ToString("N2")</td>
+                                <td>
+                                    $@((detalle.PrecioCompra * detalle.Cantidad).ToString("N2"))
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var detalle in compra.CompraDetalle)
-                            {
-                                <tr class="text-center">
-                                    <td>@detalle.Libro?.Titulo</td>
-                                    <td>@detalle.Cantidad</td>
-                                    <td>@(detalle.PorcentajeGanancia.ToString("0.##")) %</td>
-                                    <td>$@detalle.PrecioCompra</td>
-                                    <td>$@detalle.PrecioVenta.ToString("N2")</td>
-                                    <td>$@((detalle.PrecioCompra * detalle.Cantidad).ToString("N2"))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="card-footer text-center">
-            <a href="/Compras/Index" class="bi bi-arrow-return-left btn btn-outline-primary">Volver</a>
+        <div class="card-footer text-center bg-light rounded-bottom-4">
+            <a href="/Compras/Index" class="btn btn-outline-primary btn-lg px-4">
+                <i class="bi bi-arrow-left-circle me-2"></i>Volver a la lista
+            </a>
         </div>
     </div>
 </div>
@@ -56,14 +69,9 @@
     [Parameter]
     public int CompraId { get; set; }
     public Compras compra { get; set; } = new Compras();
-    public List<Libros> ListaLibros { get; set; } = new List<Libros>();
-    public Libros Libros { get; set; } = new Libros();
-    public ComprasDetalle Detalle { get; set; } = new ComprasDetalle();
-
 
     protected override async Task OnInitializedAsync()
     {
-        ListaLibros = await libroService.Listar();
         compra = await comprasService.Buscar(CompraId);
     }
 }

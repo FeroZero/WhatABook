@@ -2,46 +2,77 @@
 @inject ComprasService comprasService
 @inject LibrosService libroService
 @inject NavigationManager navigate
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
+
 
 
 <PageTitle>Lista de Compras</PageTitle>
 
-<div class="container">
-    <div class="card shadow-lg">
-        <div class="card-header">
-            <div class="card-title">Lista de Compras</div>
+<div class="container py-4">
+
+    <!-- Botón de volver -->
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary rounded-pill px-4" @onclick="VolverAInicio">
+            <i class="bi bi-arrow-left-circle-fill me-2"></i> Volver al inicio
+        </button>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-dark text-white rounded-top-4">
+            <h4 class="mb-0"><i class="bi bi-bag-check me-2"></i>Lista de Compras</h4>
         </div>
 
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Fecha de compra</th>
-                        <th>Monto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var compra in ListaCompras)
-                    {
-                        <tr>
-                            <td>@compra.Fecha.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                @(
-                                    compra.CompraDetalle
-                                    .Sum(detalle => detalle.PrecioCompra * detalle.Cantidad)
-                                    .ToString("C")
-                                    )
-                            </td>
-                            <td><a href="/Compras/Ver/@compra.CompraId" class="bi bi-pencil-square btn btn-outline-success">Ver</a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="card-body bg-light">
+            @if (ListaCompras.Count == 0)
+            {
+                <div class="alert alert-info text-center">
+                    No hay compras registradas aún.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col"> Fecha</th>
+                                <th scope="col"> Monto</th>
+                                <th scope="col"> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var compra in ListaCompras)
+                            {
+                                <tr>
+                                    <td>@compra.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td class="fw-bold text-success">
+                                        @(
+                                            compra.CompraDetalle
+                                            .Sum(detalle => detalle.PrecioCompra * detalle.Cantidad)
+                                            .ToString("C")
+                                            )
+                                    </td>
+                                    <td>
+                                        <a href="/Compras/Ver/@compra.CompraId" class="btn btn-outline-primary btn-sm rounded-pill">
+                                            <i class="bi bi-eye-fill me-1"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
 
-        <div class="card-footer text-center">
-            <a href="/Compras/Create" class="bi bi-plus-circle btn btn-outline-success">Crear Nuevo Libro</a>
+        <div class="card-footer text-end bg-white">
+            <a href="/Compras/Create" class="btn btn-success rounded-pill px-4">
+                <i class="bi bi-plus-circle me-1"></i> Nueva Compra
+            </a>
         </div>
     </div>
 </div>
@@ -56,5 +87,10 @@
     {
         ListaCompras = await comprasService.Listar();
         ListaLibros = await libroService.Listar();
+    }
+
+    private void VolverAInicio()
+    {
+        navigate.NavigateTo("/admin/Index");
     }
 }
