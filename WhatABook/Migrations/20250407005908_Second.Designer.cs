@@ -12,7 +12,7 @@ using WhatABook.Data;
 namespace WhatABook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250404032101_Second")]
+    [Migration("20250407005908_Second")]
     partial class Second
     {
         /// <inheritdoc />
@@ -240,21 +240,29 @@ namespace WhatABook.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraId"));
 
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CompraId");
+
+                    b.ToTable("Compras");
+                });
+
+            modelBuilder.Entity("WhatABook.Models.ComprasDetalle", b =>
+                {
+                    b.Property<int>("CompraDetalleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraDetalleId"));
+
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
-                    b.Property<double>("Costo")
-                        .HasColumnType("float");
-
-                    b.Property<int>("LibroId")
+                    b.Property<int>("CompraId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LibroNombre")
-                        .IsRequired()
-                        .HasMaxLength(70)
-                        .HasColumnType("nvarchar(70)");
-
-                    b.Property<int?>("LibrosLibroId")
+                    b.Property<int>("LibroId")
                         .HasColumnType("int");
 
                     b.Property<double>("PorcentajeGanancia")
@@ -266,13 +274,36 @@ namespace WhatABook.Migrations
                     b.Property<double>("PrecioVenta")
                         .HasColumnType("float");
 
-                    b.HasKey("CompraId");
+                    b.HasKey("CompraDetalleId");
+
+                    b.HasIndex("CompraId");
 
                     b.HasIndex("LibroId");
 
-                    b.HasIndex("LibrosLibroId");
+                    b.ToTable("ComprasDetalle");
+                });
 
-                    b.ToTable("Compras");
+            modelBuilder.Entity("WhatABook.Models.DetalleLibroGenero", b =>
+                {
+                    b.Property<int>("DetalleLibroGeneroId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetalleLibroGeneroId"));
+
+                    b.Property<int>("GeneroId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LibroId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DetalleLibroGeneroId");
+
+                    b.HasIndex("GeneroId");
+
+                    b.HasIndex("LibroId");
+
+                    b.ToTable("DetalleLibroGenero");
                 });
 
             modelBuilder.Entity("WhatABook.Models.Generos", b =>
@@ -295,27 +326,42 @@ namespace WhatABook.Migrations
                         new
                         {
                             GeneroId = 1,
-                            TipoGeneros = "Accion"
+                            TipoGeneros = "Acción"
                         },
                         new
                         {
                             GeneroId = 2,
-                            TipoGeneros = "Drama"
+                            TipoGeneros = "Aventura"
                         },
                         new
                         {
                             GeneroId = 3,
-                            TipoGeneros = "Misterio"
+                            TipoGeneros = "Ciencia Ficción"
                         },
                         new
                         {
                             GeneroId = 4,
-                            TipoGeneros = "Fantasia"
+                            TipoGeneros = "Fantasía"
                         },
                         new
                         {
                             GeneroId = 5,
-                            TipoGeneros = "Romantica"
+                            TipoGeneros = "Romance"
+                        },
+                        new
+                        {
+                            GeneroId = 6,
+                            TipoGeneros = "Horror"
+                        },
+                        new
+                        {
+                            GeneroId = 7,
+                            TipoGeneros = "Literatura juvenil"
+                        },
+                        new
+                        {
+                            GeneroId = 8,
+                            TipoGeneros = "Poesía"
                         });
                 });
 
@@ -331,6 +377,9 @@ namespace WhatABook.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -338,12 +387,12 @@ namespace WhatABook.Migrations
                     b.Property<DateTime>("FechaPublicacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GeneroId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImagenUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Precio")
+                        .HasColumnType("float");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -351,9 +400,36 @@ namespace WhatABook.Migrations
 
                     b.HasKey("LibroId");
 
-                    b.HasIndex("GeneroId");
-
                     b.ToTable("Libros");
+                });
+
+            modelBuilder.Entity("WhatABook.Models.MetodosDePagos", b =>
+                {
+                    b.Property<int>("MetodoPagoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MetodoPagoId"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MetodoPagoId");
+
+                    b.ToTable("MetodosDePagos");
+
+                    b.HasData(
+                        new
+                        {
+                            MetodoPagoId = 1,
+                            Descripcion = "Efectivo"
+                        },
+                        new
+                        {
+                            MetodoPagoId = 2,
+                            Descripcion = "Tarjeta"
+                        });
                 });
 
             modelBuilder.Entity("WhatABook.Models.Ordenes", b =>
@@ -364,13 +440,28 @@ namespace WhatABook.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrdenId"));
 
-                    b.Property<DateOnly>("Fecha")
-                        .HasColumnType("date");
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MetodoDePagoId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("MontoTotal")
+                        .HasColumnType("float");
+
+                    b.Property<string>("NombreUsuario")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("OrdenId");
+
+                    b.HasIndex("MetodoDePagoId");
 
                     b.ToTable("Ordenes");
                 });
@@ -395,17 +486,11 @@ namespace WhatABook.Migrations
                     b.Property<int>("OrdenId")
                         .HasColumnType("int");
 
-                    b.Property<int>("librosLibroId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ordenesOrdenId")
-                        .HasColumnType("int");
-
                     b.HasKey("DetalleId");
 
-                    b.HasIndex("librosLibroId");
+                    b.HasIndex("LibroId");
 
-                    b.HasIndex("ordenesOrdenId");
+                    b.HasIndex("OrdenId");
 
                     b.ToTable("OrdenesDetalle");
                 });
@@ -461,54 +546,80 @@ namespace WhatABook.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WhatABook.Models.Compras", b =>
+            modelBuilder.Entity("WhatABook.Models.ComprasDetalle", b =>
                 {
+                    b.HasOne("WhatABook.Models.Compras", null)
+                        .WithMany("CompraDetalle")
+                        .HasForeignKey("CompraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WhatABook.Models.Libros", "Libro")
                         .WithMany()
                         .HasForeignKey("LibroId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("WhatABook.Models.Libros", null)
-                        .WithMany("Compras")
-                        .HasForeignKey("LibrosLibroId");
 
                     b.Navigation("Libro");
                 });
 
-            modelBuilder.Entity("WhatABook.Models.Libros", b =>
+            modelBuilder.Entity("WhatABook.Models.DetalleLibroGenero", b =>
                 {
-                    b.HasOne("WhatABook.Models.Generos", "Generos")
+                    b.HasOne("WhatABook.Models.Generos", "Genero")
                         .WithMany()
                         .HasForeignKey("GeneroId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Generos");
+                    b.HasOne("WhatABook.Models.Libros", "Libro")
+                        .WithMany("ListaGeneros")
+                        .HasForeignKey("LibroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genero");
+
+                    b.Navigation("Libro");
+                });
+
+            modelBuilder.Entity("WhatABook.Models.Ordenes", b =>
+                {
+                    b.HasOne("WhatABook.Models.MetodosDePagos", "MetodoDePago")
+                        .WithMany()
+                        .HasForeignKey("MetodoDePagoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MetodoDePago");
                 });
 
             modelBuilder.Entity("WhatABook.Models.OrdenesDetalle", b =>
                 {
-                    b.HasOne("WhatABook.Models.Libros", "libros")
+                    b.HasOne("WhatABook.Models.Libros", "Libros")
                         .WithMany()
-                        .HasForeignKey("librosLibroId")
+                        .HasForeignKey("LibroId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WhatABook.Models.Ordenes", "ordenes")
+                    b.HasOne("WhatABook.Models.Ordenes", "Ordenes")
                         .WithMany("ordenes")
-                        .HasForeignKey("ordenesOrdenId")
+                        .HasForeignKey("OrdenId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("libros");
+                    b.Navigation("Libros");
 
-                    b.Navigation("ordenes");
+                    b.Navigation("Ordenes");
+                });
+
+            modelBuilder.Entity("WhatABook.Models.Compras", b =>
+                {
+                    b.Navigation("CompraDetalle");
                 });
 
             modelBuilder.Entity("WhatABook.Models.Libros", b =>
                 {
-                    b.Navigation("Compras");
+                    b.Navigation("ListaGeneros");
                 });
 
             modelBuilder.Entity("WhatABook.Models.Ordenes", b =>
