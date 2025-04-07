@@ -46,7 +46,36 @@ public class ComprasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	public async Task<bool> Insertar(Compras compra)
 	{
 		await using var context = await DbFactory.CreateDbContextAsync();
+
+		foreach (var detalle in compra.CompraDetalle)
+		{
+			if (detalle.Libro != null)
+			{
+				// Recupera el libro de la base de datos para evitar conflictos de rastreo
+				var libroExistente = await context.Libros
+					.Include(l => l.ListaGeneros) // Incluye los géneros relacionados
+					.ThenInclude(g => g.Genero)
+					.FirstOrDefaultAsync(l => l.LibroId == detalle.Libro.LibroId);
+
+				if (libroExistente != null)
+				{
+					// Asocia el libro existente al detalle
+					detalle.Libro = libroExistente;
+
+					// Asegúrate de que los géneros relacionados no sean rastreados como nuevas instancias
+					foreach (var generoDetalle in libroExistente.ListaGeneros)
+					{
+						context.Entry(generoDetalle.Genero).State = EntityState.Unchanged;
+					}
+				}
+			}
+		}
+
+		// Agrega la compra
 		context.Compras.Add(compra);
+
+		// Guarda los cambios
 		return await context.SaveChangesAsync() > 0;
 	}
+
 }
