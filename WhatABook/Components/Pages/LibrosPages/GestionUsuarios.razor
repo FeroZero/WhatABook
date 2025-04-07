@@ -1,0 +1,58 @@
+﻿@page "/Admin/Usuarios"
+@inject NavigationManager navigate
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@rendermode InteractiveServer
+
+<PageTitle>Gestión de Usuarios</PageTitle>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-start mb-3">
+        <button class="btn btn-dark" @onclick="VolverAInicio">
+            <i class="bi bi-arrow-left-circle-fill"></i> Volver
+        </button>
+    </div>
+
+    <h3 class="text-center mb-4"><i class="bi bi-people-fill"></i> Usuarios Registrados</h3>
+
+    @if (usuarios == null)
+    {
+        <p class="text-center">Cargando usuarios...</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Correo</th>
+                        <th>Fecha de Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in usuarios)
+                    {
+                        <tr>
+                            <td>@user.Email</td>
+                            <td>@(user.LockoutEnd?.DateTime.ToString("dd/MM/yyyy") ?? "Activo")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    
+    private List<ApplicationUser> usuarios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarios = UserManager.Users.ToList(); // Esto trae todos los usuarios de Identity
+    }
+    private void VolverAInicio()
+    {
+        navigate.NavigateTo("/admin/Index");
+    }
+}
