@@ -29,7 +29,6 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Correo</th>
-                        <th>Fecha de Registro</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,7 +36,6 @@
                     {
                         <tr>
                             <td>@user.Email</td>
-                            <td>@(user.LockoutEnd?.DateTime.ToString("dd/MM/yyyy") ?? "Activo")</td>
                         </tr>
                     }
                 </tbody>

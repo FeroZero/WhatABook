@@ -1,17 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-
-<div class="navbar navbar-expand-lg fixed-top custom-navbar" id="NavigationBar">
+<div class="navbar navbar-expand-lg fixed-top custom-navbar py-2" id="NavigationBar">
     <div class="container-fluid">
         <!-- Logo con ícono y texto -->
-        <a class="navbar-brand d-flex align-items-center" style="font-family: 'Permanent Marker', sans-serif; color: #FFFFFF; font-weight: bold;">
+        <a class="navbar-brand d-flex align-items-center" style="font-family: 'Permanent Marker', sans-serif; color: #FFFFFF; font-weight: bold; font-size: 1.25rem;">
             <span>WhatABook</span>
-            <i class="bi bi-book ms-2"></i>
+            <i class="bi bi-book ms-2 fs-4"></i>
         </a>
         <!-- Botón hamburguesa para cerrar sesión -->
         <div class="dropdown ms-auto">
-            <button class="btn text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-list fs-2"></i> <!-- Ícono de tres rayas -->
+            <button class="btn text-white p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-list fs-3"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
@@ -25,33 +24,27 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
     </div>
 </div>
 
-
 <main class="flex-grow-1 p-4 mt-5 pt-7 bg-white">
-    <!-- Cambié pt-3 a pt-5 para aumentar el padding superior -->
-
-
-
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
 
-
     <article class="content bg-white">
         @Body
     </article>
 </main>
 
-
 <style>
     .custom-navbar {
-        background-color: #660f0f;/* Color de fondo personalizado */
+        background-color: #660f0f;
         transition: background-color 0.3s ease-in-out;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
     }
 
     .nav-link {
