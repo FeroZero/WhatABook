@@ -10,20 +10,6 @@
 
 <PageTitle>WhatABook</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        <a href="/carrito" class="btn btn-outline-primary position-relative">
-            <i class="bi bi-cart"></i> Carrito
-            @if (totalLibrosEnCarrito > 0)
-            {
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    @totalLibrosEnCarrito
-                </span>
-            }
-        </a>
-    </Authorized>
-</AuthorizeView>
-
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="search-bar">
         <input type="text" @bind="searchTitle" class="form-control" placeholder="Buscar por título...">
@@ -267,14 +253,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
         Libros = await LibrosService.Listar();
 
-        if (user.Identity is not null && user.Identity.IsAuthenticated)
-        {
-            totalLibrosEnCarrito = await OrdenesService.ObtenerCantidadLibrosEnCarrito();
-        }
+
     }
 
     private void Restablecer()
@@ -330,7 +311,7 @@
         }
         else
         {
-            // Puedes agregar un mensaje visual aquí si quieres mostrar un error
+           
             Console.WriteLine("Error al agregar al carrito. Verifica el stock.");
         }
     }
