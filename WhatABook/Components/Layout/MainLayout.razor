@@ -1,5 +1,11 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject OrdenesService OrdenesService
+@inject LibrosService LibrosService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Identity
+@using WhatABook.Models
+@using Microsoft.AspNetCore.Authorization;
 
 <div class="navbar navbar-expand-lg fixed-top custom-navbar py-2" id="NavigationBar">
     <div class="container-fluid">
@@ -10,17 +16,32 @@
         </a>
 
         <div class="d-flex align-items-center ms-auto">
-            @if (!NavigationManager.Uri.Contains("/Home")&&
+            @if (!NavigationManager.Uri.Contains("/Home") &&
             !NavigationManager.Uri.Contains("Account/Login") &&
             !NavigationManager.Uri.Contains("Account/Register"))
             {
                 <!-- Botón de inicio (casita) -->
-                <a href="/" class="btn text-white p-0 me-2">
+                <a href="/" class="btn text-white p-0 me-3">
                     <i class="bi bi-house-door fs-3"></i>
                 </a>
 
+                <!-- Ícono de carrito -->
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/carrito" class="btn text-white position-relative me-3">
+                            <i class="bi bi-cart fs-4"></i>
+                            @if (totalLibrosEnCarrito > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    @totalLibrosEnCarrito
+                                </span>
+                            }
+                        </a>
+                    </Authorized>
+                </AuthorizeView>
+
                 <!-- Botón hamburguesa -->
-                <div class="dropdown ms-auto">
+                <div class="dropdown">
                     <button class="btn text-white p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-list fs-3"></i>
                     </button>
@@ -36,7 +57,6 @@
 
                         <AuthorizeView>
                             <Authorized>
-                                <!-- Mostrar solo si está logueado -->
                                 <li>
                                     <a class="dropdown-item text-danger" href="/Home">
                                         <i class="bi bi-box-arrow-in-right me-2"></i> Cerrar Sesión
@@ -44,7 +64,6 @@
                                 </li>
                             </Authorized>
                             <NotAuthorized>
-                                <!-- Mostrar si NO está logueado -->
                                 <li>
                                     <a class="dropdown-item text-primary" href="Account/Login">
                                         <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar sesión
@@ -61,12 +80,15 @@
                 </div>
             }
         </div>
-        <!-- Botón de colapso para dispositivos móviles -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+        <!-- Botón de colapso para móviles -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
+
 
 <main class="flex-grow-1 p-4 mt-5 pt-7 bg-white">
     <div id="blazor-error-ui">
@@ -100,3 +122,21 @@
         margin-top: 5rem;
     }
 </style>
+@code{
+    private List<Libros> Libros { get; set; } = new();
+    private int totalLibrosEnCarrito = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        Libros = await LibrosService.Listar();
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            totalLibrosEnCarrito = await OrdenesService.ObtenerCantidadLibrosEnCarrito();
+        }
+    }
+
+}
