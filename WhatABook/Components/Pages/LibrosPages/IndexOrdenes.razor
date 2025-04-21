@@ -51,7 +51,6 @@
                                 <th>Estado</th>
                                 <th>Fecha</th>
                                 <th>Monto Total</th>
-                                <th>Detalles</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,11 +62,7 @@
                                     <td>@orden.Estado</td>
                                     <td>@orden.Fecha.ToString("dd/MM/yyyy")</td>
                                     <td><strong>$@orden.MontoTotal.ToString("N2")</strong></td>
-                                    <td>
-                                        <button class="btn btn-outline-info btn-sm" @onclick="() => VerDetalles(orden.OrdenId)">
-                                            <i class="bi bi-eye-fill me-1"></i>Ver
-                                        </button>
-                                    </td>
+                                    
                                 </tr>
                             }
                         </tbody>
