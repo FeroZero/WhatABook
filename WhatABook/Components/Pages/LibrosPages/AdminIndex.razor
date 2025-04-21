@@ -32,9 +32,20 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-light h-100">
                 <h5 class="card-title"><i class="bi bi-cart"></i> Compras</h5>
-                <p class="card-text text-muted">Revisa las compras realizadas por los clientes.</p>
+                <p class="card-text text-muted">Revisa las compras de libros por el administrador.</p>
                 <button type="button" class="btn btn-primary mt-auto" @onclick="IrACompras">
                     Ver Compras
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de Órdenes -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-light h-100">
+                <h5 class="card-title"><i class="bi bi-box"></i> Órdenes</h5>
+                <p class="card-text text-muted">Gestiona las órdenes realizadas por los clientes.</p>
+                <button type="button" class="btn btn-primary mt-auto" @onclick="IrAOrdenes">
+                    Ver Órdenes
                 </button>
             </div>
         </div>
@@ -70,5 +81,10 @@
     public void IrAUsuarios()
     {
         navigate.NavigateTo("Admin/Usuarios");
+    }
+
+    public void IrAOrdenes()
+    {
+        navigate.NavigateTo("/ordenes");
     }
 }  
