@@ -2,7 +2,12 @@
 @inject OrdenesService OrdenesService
 @inject MetodoDePagoServices MetodoDePagoService
 @inject NavigationManager navigate
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using WhatABook.Models
+@using Microsoft.AspNetCore.Authorization;
 @rendermode InteractiveServer
+
+@attribute [Authorize]
 
 <h2>Mi carrito</h2>
 
@@ -63,6 +68,10 @@ else
             <option value="@metodo.MetodoPagoId">@metodo.Descripcion</option>
         }
     </InputSelect>
+    @if (!string.IsNullOrEmpty(errorMetodoPago))
+    {
+        <div class="text-danger mt-1">@errorMetodoPago</div>
+    }
 
     <h4>Total: @Ordenes.MontoTotal.ToString("N2")</h4>
 
@@ -74,11 +83,22 @@ else
     private List<MetodosDePagos> metodosDePago = new();
     private Ordenes Ordenes { get; set; } = new Ordenes() { MetodoDePagoId = 0 };
     private List<OrdenesDetalle> detalleOrdenes { get; set; } = new List<OrdenesDetalle>();
+    private string errorMetodoPago = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarCarrito();
-        metodosDePago = await MetodoDePagoService.Listar();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is null || !user.Identity.IsAuthenticated)
+        {
+            navigate.NavigateTo("/");
+        }
+        else
+        {
+            await CargarCarrito();
+            metodosDePago = await MetodoDePagoService.Listar();
+        } 
     }
 
     private async Task CargarCarrito()
@@ -107,8 +127,16 @@ else
 
     private async Task FinalizarCompra()
     {
+        if (Ordenes.MetodoDePagoId == 0)
+        {
+            errorMetodoPago = "Por favor selecciona un método de pago antes de finalizar la compra.";
+            return;
+        }
+
+        errorMetodoPago = string.Empty;
+
         await OrdenesService.FinalizarOrden(Ordenes.MetodoDePagoId);
-        navigate.NavigateTo("/Usuario/Index");
+        navigate.NavigateTo("/");
     }
 }
 
