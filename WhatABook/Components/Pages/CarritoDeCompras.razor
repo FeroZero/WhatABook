@@ -1,57 +1,114 @@
-﻿@* componente estático para mostrar visualmente el carrito *@
-@page "/Carrito"
-<div class="container mt-4">
-    <h3>carrito de compras</h3>
+﻿@page "/carrito"
+@inject OrdenesService OrdenesService
+@inject MetodoDePagoServices MetodoDePagoService
+@inject NavigationManager navigate
+@rendermode InteractiveServer
 
-    <table class="table table-bordered">
+<h2>Mi carrito</h2>
+
+@if (detalleOrdenes == null)
+{
+    <p>Cargando...</p>
+}
+else if (detalleOrdenes.Count == 0)
+{
+    <p>No tienes libros en el carrito.</p>
+}
+else
+{
+    <table class="table">
         <thead>
             <tr>
-                <th>libro</th>
-                <th>cantidad</th>
-                <th>precio unitario</th>
-                <th>subtotal</th>
-                <th>acciones</th>
+                <th>Titulo</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>el principito</td>
-                <td>2</td>
-                <td>$10.00</td>
-                <td>$20.00</td>
-                <td>
-                    <button class="btn btn-danger btn-sm">eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>cien años de soledad</td>
-                <td>1</td>
-                <td>$15.00</td>
-                <td>$15.00</td>
-                <td>
-                    <button class="btn btn-danger btn-sm">eliminar</button>
-                </td>
-            </tr>
+            @foreach (var item in detalleOrdenes)
+            {
+                <tr>
+                    <td>@item.Libros.Titulo</td>
+                    <td>@item.Libros.Precio.ToString("N2")</td>
+                    <td>
+                        <input type="number" min="1" max="@item.Libros.Cantidad"
+                        @bind="item.Cantidad"
+                        @bind:event="oninput"
+                        class="form-control"
+                        style="width: 80px" />
+                        <button class="btn btn-sm btn-primary mt-1"
+                        @onclick="() => ActualizarCantidad(item.DetalleId, item.Cantidad)">
+                            Actualizar
+                        </button>
+                    </td>
+                    <td>@item.Monto.ToString("N2")</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                        @onclick="() => Eliminar(item.DetalleId)">
+                            Quitar
+                        </button>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
-    <div class="text-end">
-        <h5>total: $35.00</h5>
-        <button class="btn btn-primary">finalizar compra</button>
-    </div>
-</div>
+    <label class="form-label"> Método de Pago </label>
+    <InputSelect class="form-select" @bind-Value="Ordenes.MetodoDePagoId">
+        <option disabled value="0">Seleccione un método de pago</option>
+        @foreach (var metodo in metodosDePago)
+        {
+            <option value="@metodo.MetodoPagoId">@metodo.Descripcion</option>
+        }
+    </InputSelect>
+
+    <h4>Total: @Ordenes.MontoTotal.ToString("N2")</h4>
+
+    <button class="btn btn-success" @onclick="FinalizarCompra">Finalizar compra</button>
+    <button class="btn btn-outline-danger ms-2" @onclick="Vaciar">Vaciar carrito</button>
+}
 
 @code {
-    [Parameter]
-    public int OrdenId { get; set; }
-
-    private Ordenes orden;
-    private List<OrdenesDetalle> detalles = new();
-    private double total = 0;
+    private List<MetodosDePagos> metodosDePago = new();
+    private Ordenes Ordenes { get; set; } = new Ordenes() { MetodoDePagoId = 0 };
+    private List<OrdenesDetalle> detalleOrdenes { get; set; } = new List<OrdenesDetalle>();
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarCarrito();
+        metodosDePago = await MetodoDePagoService.Listar();
+    }
 
+    private async Task CargarCarrito()
+    {
+        detalleOrdenes = await OrdenesService.ObtenerOrdenes();
+        Ordenes.MontoTotal = detalleOrdenes.Sum(x => x.Monto);
+    }
+
+    private async Task Eliminar(int detalleId)
+    {
+        await OrdenesService.EliminarLibroDelCarrito(detalleId);
+        await CargarCarrito();
+    }
+
+    private async Task Vaciar()
+    {
+        await OrdenesService.VaciarCarrito();
+        await CargarCarrito();
+    }
+
+    private async Task ActualizarCantidad(int detalleId, int nuevaCantidad)
+    {
+        await OrdenesService.ActualizarCantidadLibro(detalleId, nuevaCantidad);
+        await CargarCarrito();
+    }
+
+    private async Task FinalizarCompra()
+    {
+        await OrdenesService.FinalizarOrden(Ordenes.MetodoDePagoId);
+        navigate.NavigateTo("/Usuario/Index");
     }
 }
 

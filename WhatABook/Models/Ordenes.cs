@@ -10,7 +10,7 @@ public class Ordenes
 	public int OrdenId { get; set; }
 
 	[ForeignKey("ApplicationUser")]
-	public int UsuarioId { get; set; }
+	public string UsuarioId { get; set; }
 
 	[RegularExpression(@"[A-Za-z\sáéíóúÁÉÍÓÚñÑ]+$", ErrorMessage = "Caracter inválido")]
 	[StringLength(70, ErrorMessage = "Límite Excedido.")]
@@ -19,14 +19,15 @@ public class Ordenes
 	public EstadoOrden Estado { get; set; } = EstadoOrden.Pendiente;
 
 	[ForeignKey("MetodoDePago")]
-	public int MetodoDePagoId { get; set; }
+	public int? MetodoDePagoId { get; set; }
+
+	public MetodosDePagos? MetodoDePago { get; set; }
 
 	[Required(ErrorMessage = "Campo Obligatorio.")]
 	public DateTime Fecha { get; set; }
 
 	public double MontoTotal { get; set; }
 
-	public ICollection<OrdenesDetalle> ordenes { get; set; } = new List<OrdenesDetalle>();
+	public virtual ICollection<OrdenesDetalle> ordenes { get; set; } = new List<OrdenesDetalle>();
 
-	public MetodosDePagos? MetodoDePago { get; set; }
 }

@@ -7,11 +7,10 @@ namespace WhatABook.Services
 {
 	public class MetodoDePagoServices(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
-		public async Task<List<MetodosDePagos>> Listar(Expression<Func<MetodosDePagos, bool>> criterio)
+		public async Task<List<MetodosDePagos>> Listar()
 		{
 			await using var contexto = await DbFactory.CreateDbContextAsync();
 			return await contexto.MetodosDePagos
-				.Where(criterio)
 				.ToListAsync();
 		}
 	}

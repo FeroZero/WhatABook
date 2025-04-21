@@ -443,7 +443,7 @@ namespace WhatABook.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MetodoDePagoId")
+                    b.Property<int?>("MetodoDePagoId")
                         .HasColumnType("int");
 
                     b.Property<double>("MontoTotal")
@@ -453,8 +453,9 @@ namespace WhatABook.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("nvarchar(70)");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrdenId");
 
@@ -583,9 +584,7 @@ namespace WhatABook.Migrations
                 {
                     b.HasOne("WhatABook.Models.MetodosDePagos", "MetodoDePago")
                         .WithMany()
-                        .HasForeignKey("MetodoDePagoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MetodoDePagoId");
 
                     b.Navigation("MetodoDePago");
                 });

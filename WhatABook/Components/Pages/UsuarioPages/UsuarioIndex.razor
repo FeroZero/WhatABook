@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject LibrosService LibrosService
+@inject OrdenesService OrdenesService
 @inject NavigationManager navigate
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -8,6 +9,16 @@
 @rendermode InteractiveServer
 <PageTitle>WhatABook</PageTitle>
 
+
+<a href="/carrito" class="btn btn-outline-primary position-relative">
+    <i class="bi bi-cart"></i> Carrito
+    @if (totalLibrosEnCarrito > 0)
+    {
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            @totalLibrosEnCarrito
+        </span>
+    }
+</a>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="search-bar">
@@ -242,27 +253,28 @@
     private string selectedGenero { get; set; } = string.Empty;
     private bool filterApplied { get; set; } = false;
 
+    // Usuario temporal (luego se reemplaza con autenticación real)
+    private int totalLibrosEnCarrito = 0;
+    private int usuarioId = 1; // Temporal, hasta que uses auth
+
     private List<string> GenerosUnicos => Libros
      .Where(l => l.ListaGeneros != null && l.ListaGeneros.Any())
-     .SelectMany(l => l.ListaGeneros) // Aplana la colección de géneros
-     .Select(dlg => dlg.Genero.TipoGeneros) // Accede a TipoGeneros en lugar de Nombre
+     .SelectMany(l => l.ListaGeneros)
+     .Select(dlg => dlg.Genero.TipoGeneros)
      .Distinct()
      .ToList();
-    
 
     protected override async Task OnInitializedAsync()
     {
         Libros = await LibrosService.Listar();
-
-        
+        totalLibrosEnCarrito = await OrdenesService.ObtenerCantidadLibrosEnCarrito();
     }
 
     private void Restablecer()
     {
-        
         searchTitle = string.Empty;
         selectedGenero = string.Empty;
-        filterApplied = false; 
+        filterApplied = false;
     }
 
     private void ApplyFilters()
@@ -284,6 +296,7 @@
         return query.ToList();
     }
 
+
     private async Task VerificarYAgregar(Libros libro)
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -299,9 +312,19 @@
             navigate.NavigateTo("/Account/Register"); // o "/Identity/Account/Register" si usas Identity
         }
     }
-
-    private void AddToCart(Libros libro)
+      
+    private async Task AddToCart(Libros libro)
     {
-        navigate.NavigateTo("/carrito");
+        var exito = await OrdenesService.AgregarOrdenes(libro.LibroId, 1);
+
+        if (exito)
+        {
+            navigate.NavigateTo("/carrito");
+        }
+        else
+        {
+            // Puedes agregar un mensaje visual aquí si quieres mostrar un error
+            Console.WriteLine("Error al agregar al carrito. Verifica el stock.");
+        }
     }
 }
