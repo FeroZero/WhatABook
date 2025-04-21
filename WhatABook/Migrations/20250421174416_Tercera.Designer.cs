@@ -12,7 +12,7 @@ using WhatABook.Data;
 namespace WhatABook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250420222551_Tercera")]
+    [Migration("20250421174416_Tercera")]
     partial class Tercera
     {
         /// <inheritdoc />
