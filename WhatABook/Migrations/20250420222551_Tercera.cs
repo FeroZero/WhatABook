@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WhatABook.Migrations
 {
     /// <inheritdoc />
-    public partial class Second : Migration
+    public partial class Tercera : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -281,10 +281,10 @@ namespace WhatABook.Migrations
                 {
                     OrdenId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    UsuarioId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NombreUsuario = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: true),
                     Estado = table.Column<int>(type: "int", nullable: false),
-                    MetodoDePagoId = table.Column<int>(type: "int", nullable: false),
+                    MetodoDePagoId = table.Column<int>(type: "int", nullable: true),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MontoTotal = table.Column<double>(type: "float", nullable: false)
                 },
@@ -295,8 +295,7 @@ namespace WhatABook.Migrations
                         name: "FK_Ordenes_MetodosDePagos_MetodoDePagoId",
                         column: x => x.MetodoDePagoId,
                         principalTable: "MetodosDePagos",
-                        principalColumn: "MetodoPagoId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "MetodoPagoId");
                 });
 
             migrationBuilder.CreateTable(
