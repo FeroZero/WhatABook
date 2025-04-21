@@ -2,6 +2,7 @@
 @inject LibrosService LibrosService
 @inject OrdenesService OrdenesService
 @inject NavigationManager navigate
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
 @using WhatABook.Models
@@ -32,7 +33,7 @@ else
                 <p class="text-muted"><strong>Precio:</strong> No disponible</p>
             }
 
-            <button class="btn btn-primary" @onclick="() => AddToCart(libro)">
+            <button class="btn btn-primary" @onclick="() => VerificarYAgregar(libro)">
                 <i class="bi bi-cart "></i> Añadir al carrito
             </button>
             <a href="/" class="btn btn-secondary ms-2">Volver al inicio</a>
@@ -109,6 +110,22 @@ else
     {
         var todosLosLibros = await LibrosService.Listar();
         libro = todosLosLibros.FirstOrDefault(l => l.LibroId == id);
+    }
+
+    private async Task VerificarYAgregar(Libros libro)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            AddToCart(libro); // tu método original
+        }
+        else
+        {
+            navigate.NavigateTo("/Account/Register"); // o "/Identity/Account/Register" si usas Identity
+        }
     }
 
     private async Task AddToCart(Libros libro)

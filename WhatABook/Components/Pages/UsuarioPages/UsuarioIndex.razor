@@ -3,22 +3,26 @@
 @inject OrdenesService OrdenesService
 @inject NavigationManager navigate
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@using Microsoft.AspNetCore.Identity
 @using WhatABook.Models
-
+@using Microsoft.AspNetCore.Authorization;
 @rendermode InteractiveServer
+
 <PageTitle>WhatABook</PageTitle>
 
-
-<a href="/carrito" class="btn btn-outline-primary position-relative">
-    <i class="bi bi-cart"></i> Carrito
-    @if (totalLibrosEnCarrito > 0)
-    {
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            @totalLibrosEnCarrito
-        </span>
-    }
-</a>
+<AuthorizeView>
+    <Authorized>
+        <a href="/carrito" class="btn btn-outline-primary position-relative">
+            <i class="bi bi-cart"></i> Carrito
+            @if (totalLibrosEnCarrito > 0)
+            {
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    @totalLibrosEnCarrito
+                </span>
+            }
+        </a>
+    </Authorized>
+</AuthorizeView>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="search-bar">
@@ -252,10 +256,7 @@
     private string searchTitle { get; set; } = string.Empty;
     private string selectedGenero { get; set; } = string.Empty;
     private bool filterApplied { get; set; } = false;
-
-    // Usuario temporal (luego se reemplaza con autenticación real)
     private int totalLibrosEnCarrito = 0;
-    private int usuarioId = 1; // Temporal, hasta que uses auth
 
     private List<string> GenerosUnicos => Libros
      .Where(l => l.ListaGeneros != null && l.ListaGeneros.Any())
@@ -266,8 +267,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
         Libros = await LibrosService.Listar();
-        totalLibrosEnCarrito = await OrdenesService.ObtenerCantidadLibrosEnCarrito();
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            totalLibrosEnCarrito = await OrdenesService.ObtenerCantidadLibrosEnCarrito();
+        }
     }
 
     private void Restablecer()
