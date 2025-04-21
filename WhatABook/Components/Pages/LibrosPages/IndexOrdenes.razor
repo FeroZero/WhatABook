@@ -1,0 +1,105 @@
+﻿@page "/ordenes"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@inject NavigationManager NavigationManager
+@inject ApplicationDbContext dbContext
+@inject UserManager<ApplicationUser> UserManager
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Admin")]
+
+
+<PageTitle>Lista de Órdenes</PageTitle>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-start mb-3">
+        <button class="btn btn-outline-secondary rounded-pill px-4" @onclick="VolverAInicio">
+            <i class="bi bi-arrow-left-circle-fill me-2"></i> Volver al inicio
+        </button>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-dark text-white rounded-top-4 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Lista de Órdenes <i class="bi bi-card-list"></i></h4>
+        </div>
+
+        <div class="card-body">
+            @if (ordenes == null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando órdenes...</p>
+                </div>
+            }
+            else if (ordenes.Count == 0)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    No hay órdenes registradas.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Orden Id</th>
+                                <th>Usuario</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Monto Total</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var orden in ordenes)
+                            {
+                                <tr>
+                                    <td><strong>@orden.OrdenId</strong></td>
+                                    <td>@correosPorUsuarioId.GetValueOrDefault(orden.UsuarioId ?? "")</td>
+                                    <td>@orden.Estado</td>
+                                    <td>@orden.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td><strong>$@orden.MontoTotal.ToString("N2")</strong></td>
+                                    <td>
+                                        <button class="btn btn-outline-info btn-sm" @onclick="() => VerDetalles(orden.OrdenId)">
+                                            <i class="bi bi-eye-fill me-1"></i>Ver
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Ordenes> ordenes;
+    private Dictionary<string, string> correosPorUsuarioId = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordenes = await dbContext.Ordenes
+            .Include(o => o.MetodoDePago)
+            .Include(o => o.ordenes)
+            .ToListAsync();
+
+        var usuarios = await UserManager.Users.ToListAsync();
+        correosPorUsuarioId = usuarios.ToDictionary(u => u.Id, u => u.Email ?? "");
+    }
+
+    private void VerDetalles(int ordenId)
+    {
+        NavigationManager.NavigateTo($"/orden/ver/{ordenId}");
+    }
+
+    private void VolverAInicio()
+    {
+        NavigationManager.NavigateTo("/admin/Index");
+    }
+}
