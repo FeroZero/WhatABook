@@ -1,7 +1,8 @@
-﻿@page "/Usuario/Index"
+﻿@page "/"
 @inject LibrosService LibrosService
 @inject OrdenesService OrdenesService
 @inject NavigationManager navigate
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @using WhatABook.Models
 
@@ -50,11 +51,16 @@
                         <div class="col">
                             <div class="card h-100 text-center shadow-sm book-card d-flex flex-column">
                                 <img src="@libro.ImagenUrl" class="book-img" alt="@libro.Titulo">
-                                <h4>@libro.Precio</h4>
+                                
                                 <div class="card-body d-flex flex-column">
+                                    
                                     <h4 class="card-title">
                                         <a href="/BookDetails/@libro.LibroId" class="book-title-link">@libro.Titulo</a>
                                     </h4>
+
+                                    <h5 class="text-dark fw-normal mb-3" style="font-size: 0.9rem;">
+                                        @libro.Precio.ToString("C")
+                                    </h5>
 
                                     <button class="btn btn-primary w-100 btn-cart mt-auto" @onclick="() => AddToCart(libro)">
                                         <i class="bi bi-cart"></i> Agregar
@@ -89,7 +95,12 @@
                                     <h4 class="card-title">
                                         <a href="/BookDetails/@libro.LibroId" class="book-title-link">@libro.Titulo</a>
                                     </h4>
-                                    <button class="btn btn-primary w-100 btn-cart mt-auto" @onclick="() => AddToCart(libro)">
+
+                                    
+                                    <h5 class="text-dark fw-normal mb-3" style="font-size: 0.9rem;">
+                                        @libro.Precio.ToString("C")
+                                    </h5>
+                                    <button class="btn btn-primary w-100 btn-cart mt-auto" @onclick="() => VerificarYAgregar(libro)">
                                         <i class="bi bi-cart"></i> Agregar
                                     </button>
                                 </div>
@@ -285,6 +296,23 @@
         return query.ToList();
     }
 
+
+    private async Task VerificarYAgregar(Libros libro)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            AddToCart(libro); // tu método original
+        }
+        else
+        {
+            navigate.NavigateTo("/Account/Register"); // o "/Identity/Account/Register" si usas Identity
+        }
+    }
+      
     private async Task AddToCart(Libros libro)
     {
         var exito = await OrdenesService.AgregarOrdenes(libro.LibroId, 1);
