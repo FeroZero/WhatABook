@@ -109,6 +109,36 @@ public class OrdenesService(IDbContextFactory<ApplicationDbContext> DbFactory, I
 		}
 	}
 
+	//public async Task<bool> ActualizarCantidadLibro(int detalleId, int nuevaCantidad)
+	//{
+	//	string usuarioId = ObtenerUsuarioId();
+
+	//	await using var contexto = await DbFactory.CreateDbContextAsync();
+	//	await using var transaction = await contexto.Database.BeginTransactionAsync();
+
+	//	try
+	//	{
+	//		var detalle = await contexto.OrdenesDetalle
+	//			.Include(d => d.Libros)
+	//			.FirstOrDefaultAsync(d => d.DetalleId == detalleId && d.Ordenes.UsuarioId == usuarioId);
+
+	//		if (detalle == null || detalle.Libros == null || nuevaCantidad < 1 || nuevaCantidad > detalle.Libros.Cantidad)
+	//			return false;
+
+	//		detalle.Cantidad = nuevaCantidad;
+	//		detalle.Monto = detalle.Cantidad * detalle.Libros.Precio;
+
+	//		await contexto.SaveChangesAsync();
+	//		await transaction.CommitAsync();
+	//		return true;
+	//	}
+	//	catch
+	//	{
+	//		await transaction.RollbackAsync();
+	//		throw;
+	//	}
+	//}
+
 	public async Task<bool> ActualizarCantidadLibro(int detalleId, int nuevaCantidad)
 	{
 		string usuarioId = ObtenerUsuarioId();
@@ -118,6 +148,7 @@ public class OrdenesService(IDbContextFactory<ApplicationDbContext> DbFactory, I
 
 		try
 		{
+			// Obtener el detalle de la orden y el libro correspondiente
 			var detalle = await contexto.OrdenesDetalle
 				.Include(d => d.Libros)
 				.FirstOrDefaultAsync(d => d.DetalleId == detalleId && d.Ordenes.UsuarioId == usuarioId);
@@ -125,10 +156,22 @@ public class OrdenesService(IDbContextFactory<ApplicationDbContext> DbFactory, I
 			if (detalle == null || detalle.Libros == null || nuevaCantidad < 1 || nuevaCantidad > detalle.Libros.Cantidad)
 				return false;
 
+			// Verificar que la cantidad solicitada no exceda el inventario disponible
+			if (detalle.Libros.Cantidad < nuevaCantidad)
+				return false;
+
+			// Actualizar la cantidad del libro en el detalle de la orden
 			detalle.Cantidad = nuevaCantidad;
 			detalle.Monto = detalle.Cantidad * detalle.Libros.Precio;
 
+			// Actualizar el inventario del libro
+			detalle.Libros.Cantidad -= nuevaCantidad;
+
+			// Guardar los cambios en el contexto
+			contexto.Libros.Update(detalle.Libros);
 			await contexto.SaveChangesAsync();
+
+			// Commit de la transacción
 			await transaction.CommitAsync();
 			return true;
 		}
