@@ -8,6 +8,13 @@
             <span>WhatABook</span>
             <i class="bi bi-book ms-2 fs-4"></i>
         </a>
+
+        <div class="d-flex align-items-center ms-auto">
+            <!-- Botón de inicio (casita) -->
+            <a href="/" class="btn text-white p-0 me-2">
+                <i class="bi bi-house-door fs-3"></i>
+            </a>
+
         <!-- Botón hamburguesa -->
         <div class="dropdown ms-auto">
             <button class="btn text-white p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -15,6 +22,14 @@
             </button>
 
             <ul class="dropdown-menu dropdown-menu-end">
+                    <AuthorizeView Roles="Admin">
+                        <li>
+                            <a class="dropdown-item text-warning" href="/Admin/Index">
+                                <i class="bi bi-speedometer2 me-2"></i> Panel Admin
+                            </a>
+                        </li>
+                    </AuthorizeView>
+
                 <AuthorizeView>
                     <Authorized>
                         <!-- Mostrar solo si está logueado -->
@@ -39,6 +54,7 @@
                     </NotAuthorized>
                 </AuthorizeView>
             </ul>
+        </div>
         </div>
         <!-- Botón de colapso para dispositivos móviles -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
